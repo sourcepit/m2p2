@@ -4,8 +4,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2;
-public enum BundleStartPolicy
+package org.sourcepit.m2p2.core;
+
+import org.osgi.framework.Bundle;
+
+public interface BundleStartLevelProvider
 {
-   FORCE_START, BY_ACTIVATION_POLICY, DONT_START
+   int getBundleStartLevel(Bundle bundle);
 }

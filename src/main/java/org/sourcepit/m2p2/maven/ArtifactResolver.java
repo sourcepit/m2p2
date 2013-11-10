@@ -4,7 +4,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.maven.util;
+package org.sourcepit.m2p2.maven;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -4,17 +4,15 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.util;
+package org.sourcepit.m2p2.core;
 
-import static org.sourcepit.m2p2.BundleStartPolicy.BY_ACTIVATION_POLICY;
-import static org.sourcepit.m2p2.BundleStartPolicy.DONT_START;
-import static org.sourcepit.m2p2.BundleStartPolicy.FORCE_START;
+import static org.sourcepit.m2p2.core.BundleStartPolicy.BY_ACTIVATION_POLICY;
+import static org.sourcepit.m2p2.core.BundleStartPolicy.DONT_START;
+import static org.sourcepit.m2p2.core.BundleStartPolicy.FORCE_START;
 
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
-import org.sourcepit.m2p2.BundleStartPolicy;
-import org.sourcepit.m2p2.BundleStartPolicyProvider;
 
 public class DefaultBundleStartPolicyProvider implements BundleStartPolicyProvider
 {
@@ -34,7 +32,7 @@ public class DefaultBundleStartPolicyProvider implements BundleStartPolicyProvid
       final Boolean start = symbolicNameToStartMap.get(bundle.getSymbolicName());
       if (start == null)
       {
-         return autoStart ? BY_ACTIVATION_POLICY :DONT_START;
+         return autoStart ? BY_ACTIVATION_POLICY : DONT_START;
       }
       return start.booleanValue() ? FORCE_START : DONT_START;
    }

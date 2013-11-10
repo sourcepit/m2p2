@@ -4,12 +4,12 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.util;
+package org.sourcepit.m2p2.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
-import org.sourcepit.m2p2.util.StartConfiguration;
 
 public class StartConfigurationTest
 {

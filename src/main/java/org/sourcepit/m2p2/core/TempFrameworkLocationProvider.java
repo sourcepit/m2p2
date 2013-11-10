@@ -4,14 +4,12 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.util;
+package org.sourcepit.m2p2.core;
 
 import static org.apache.commons.io.FileUtils.forceDelete;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.sourcepit.m2p2.FrameworkLocationProvider;
 
 public class TempFrameworkLocationProvider implements FrameworkLocationProvider
 {

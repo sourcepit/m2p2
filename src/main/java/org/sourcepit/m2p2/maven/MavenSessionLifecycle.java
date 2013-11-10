@@ -17,7 +17,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sourcepit.guplex.Guplex;
 import org.sourcepit.m2p2.equinox.EmbeddedEquinox;
-import org.sourcepit.m2p2.maven.util.ChainedExecutionListener;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = "m2p2")
 public class MavenSessionLifecycle extends AbstractMavenLifecycleParticipant

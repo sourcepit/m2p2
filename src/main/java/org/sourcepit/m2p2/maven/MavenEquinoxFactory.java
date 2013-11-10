@@ -8,9 +8,9 @@ package org.sourcepit.m2p2.maven;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.sourcepit.common.maven.model.util.MavenModelUtils.parseArtifactKey;
-import static org.sourcepit.m2p2.util.StartConfigurationUtil.fromProperties;
-import static org.sourcepit.m2p2.util.StartConfigurationUtil.toBundleStartPolicyProvider;
-import static org.sourcepit.m2p2.util.StartConfigurationUtil.toStartLevelProvider;
+import static org.sourcepit.m2p2.core.StartConfigurationUtil.fromProperties;
+import static org.sourcepit.m2p2.core.StartConfigurationUtil.toBundleStartPolicyProvider;
+import static org.sourcepit.m2p2.core.StartConfigurationUtil.toStartLevelProvider;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -37,16 +37,13 @@ import org.sourcepit.common.utils.collections.Iterable2;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesSource;
-import org.sourcepit.m2p2.BundleStartPolicyProvider;
-import org.sourcepit.m2p2.FrameworkLocationProvider;
-import org.sourcepit.m2p2.StartLevelProvider;
+import org.sourcepit.m2p2.core.BundleStartPolicyProvider;
+import org.sourcepit.m2p2.core.FrameworkLocationProvider;
+import org.sourcepit.m2p2.core.StartConfiguration;
+import org.sourcepit.m2p2.core.StartLevelProvider;
+import org.sourcepit.m2p2.core.TempFrameworkLocationProvider;
 import org.sourcepit.m2p2.equinox.EmbeddedEquinox;
 import org.sourcepit.m2p2.equinox.EmbeddedEquinoxLifecycleListener;
-import org.sourcepit.m2p2.maven.util.ArtifactResolver;
-import org.sourcepit.m2p2.maven.util.LoggerAdapter;
-import org.sourcepit.m2p2.maven.util.MavenBundleURIResolver;
-import org.sourcepit.m2p2.util.StartConfiguration;
-import org.sourcepit.m2p2.util.TempFrameworkLocationProvider;
 
 @Named
 public class MavenEquinoxFactory

@@ -4,24 +4,22 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.util;
+package org.sourcepit.m2p2.core;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Integer.valueOf;
-import static org.junit.Assert.*;
-import static org.sourcepit.m2p2.util.StartConfigurationUtil.BUNDLE_AUTO_START;
-import static org.sourcepit.m2p2.util.StartConfigurationUtil.BUNDLE_DEFAULT_START_LEVEL;
-import static org.sourcepit.m2p2.util.StartConfigurationUtil.BUNDLE_START_CONFIGURATIONS;
-import static org.sourcepit.m2p2.util.StartConfigurationUtil.FRAMEWORK_START_LEVEL;
+import static org.junit.Assert.assertEquals;
+import static org.sourcepit.m2p2.core.StartConfigurationUtil.BUNDLE_AUTO_START;
+import static org.sourcepit.m2p2.core.StartConfigurationUtil.BUNDLE_DEFAULT_START_LEVEL;
+import static org.sourcepit.m2p2.core.StartConfigurationUtil.BUNDLE_START_CONFIGURATIONS;
+import static org.sourcepit.m2p2.core.StartConfigurationUtil.FRAMEWORK_START_LEVEL;
 
 import java.util.Map;
 
 import org.junit.Test;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
-import org.sourcepit.m2p2.util.StartConfiguration;
-import org.sourcepit.m2p2.util.StartConfigurationUtil;
 
 public class StartConfigurationUtilTest
 {

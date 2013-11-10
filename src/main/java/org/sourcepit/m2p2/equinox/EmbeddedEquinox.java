@@ -33,12 +33,12 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.sourcepit.common.utils.collections.Iterable2;
 import org.sourcepit.common.utils.lang.ThrowablePipe;
-import org.sourcepit.m2p2.BundleStartPolicyProvider;
-import org.sourcepit.m2p2.FrameworkLocationProvider;
-import org.sourcepit.m2p2.StartLevelProvider;
-import org.sourcepit.m2p2.util.ConfigureBundleStartLevel;
-import org.sourcepit.m2p2.util.InstallBundle;
-import org.sourcepit.m2p2.util.StartBundle;
+import org.sourcepit.m2p2.core.BundleStartPolicyProvider;
+import org.sourcepit.m2p2.core.ConfigureBundleStartLevel;
+import org.sourcepit.m2p2.core.FrameworkLocationProvider;
+import org.sourcepit.m2p2.core.InstallBundle;
+import org.sourcepit.m2p2.core.StartBundle;
+import org.sourcepit.m2p2.core.StartLevelProvider;
 
 public class EmbeddedEquinox
 {

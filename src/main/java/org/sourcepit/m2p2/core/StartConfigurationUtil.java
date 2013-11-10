@@ -4,13 +4,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.util;
+package org.sourcepit.m2p2.core;
 
 import java.util.Map;
 
 import org.sourcepit.common.utils.props.PropertiesSource;
-import org.sourcepit.m2p2.BundleStartPolicyProvider;
-import org.sourcepit.m2p2.StartLevelProvider;
 
 public final class StartConfigurationUtil
 {
