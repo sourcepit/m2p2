@@ -4,22 +4,24 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
+package org.sourcepit.osgi.embedder;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Integer.valueOf;
 import static org.junit.Assert.assertEquals;
-import static org.sourcepit.m2p2.core.StartConfigurationUtil.BUNDLE_AUTO_START;
-import static org.sourcepit.m2p2.core.StartConfigurationUtil.BUNDLE_DEFAULT_START_LEVEL;
-import static org.sourcepit.m2p2.core.StartConfigurationUtil.BUNDLE_START_CONFIGURATIONS;
-import static org.sourcepit.m2p2.core.StartConfigurationUtil.FRAMEWORK_START_LEVEL;
+import static org.sourcepit.osgi.embedder.StartConfigurationUtil.BUNDLE_AUTO_START;
+import static org.sourcepit.osgi.embedder.StartConfigurationUtil.BUNDLE_DEFAULT_START_LEVEL;
+import static org.sourcepit.osgi.embedder.StartConfigurationUtil.BUNDLE_START_CONFIGURATIONS;
+import static org.sourcepit.osgi.embedder.StartConfigurationUtil.FRAMEWORK_START_LEVEL;
 
 import java.util.Map;
 
 import org.junit.Test;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
+import org.sourcepit.osgi.embedder.StartConfiguration;
+import org.sourcepit.osgi.embedder.StartConfigurationUtil;
 
 public class StartConfigurationUtilTest
 {

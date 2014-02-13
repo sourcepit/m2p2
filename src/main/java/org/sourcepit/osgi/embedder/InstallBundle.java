@@ -4,15 +4,15 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
+package org.sourcepit.osgi.embedder;
 
-import java.net.URI;
+import java.net.URL;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.sourcepit.common.utils.collections.Functor;
 
-public class InstallBundle implements Functor<URI, BundleException>
+public class InstallBundle implements Functor<URL, BundleException>
 {
    private final BundleContext bundleContext;
 
@@ -22,8 +22,8 @@ public class InstallBundle implements Functor<URI, BundleException>
    }
 
    @Override
-   public void apply(URI bundleUri) throws BundleException
+   public void apply(URL bundleURL) throws BundleException
    {
-      bundleContext.installBundle(bundleUri.toString());
+      bundleContext.installBundle(bundleURL.toString());
    }
 }

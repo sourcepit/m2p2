@@ -4,7 +4,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
+package org.sourcepit.osgi.embedder;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;

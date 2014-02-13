@@ -8,19 +8,25 @@ package org.sourcepit.m2p2.equinox;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.sourcepit.common.utils.collections.CollectionUtils.foreach;
+import static org.sourcepit.common.utils.io.IO.cpIn;
+import static org.sourcepit.common.utils.io.IO.read;
 import static org.sourcepit.common.utils.lang.Exceptions.newThrowablePipe;
 import static org.sourcepit.common.utils.lang.Exceptions.pipe;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
-import org.eclipse.osgi.launch.EquinoxFactory;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -31,33 +37,34 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
-import org.sourcepit.common.utils.collections.Iterable2;
+import org.sourcepit.common.utils.io.Read.FromStream;
 import org.sourcepit.common.utils.lang.ThrowablePipe;
-import org.sourcepit.m2p2.core.BundleStartPolicyProvider;
-import org.sourcepit.m2p2.core.ConfigureBundleStartLevel;
-import org.sourcepit.m2p2.core.FrameworkLocationProvider;
-import org.sourcepit.m2p2.core.InstallBundle;
-import org.sourcepit.m2p2.core.StartBundle;
-import org.sourcepit.m2p2.core.StartLevelProvider;
+import org.sourcepit.osgi.embedder.BundleProvider;
+import org.sourcepit.osgi.embedder.BundleStartPolicyProvider;
+import org.sourcepit.osgi.embedder.ConfigureBundleStartLevel;
+import org.sourcepit.osgi.embedder.FrameworkLocationProvider;
+import org.sourcepit.osgi.embedder.InstallBundle;
+import org.sourcepit.osgi.embedder.StartBundle;
+import org.sourcepit.osgi.embedder.StartLevelProvider;
 
 public class EmbeddedEquinox
 {
    private final FrameworkLocationProvider frameworkLocationProvider;
    private final StartLevelProvider startLevelProvider;
    private final BundleStartPolicyProvider bundleStartPolicyProvider;
-   private final Iterable2<URI, ? extends Exception> bundleURIs;
+   private final BundleProvider<? extends Exception> bundleProvider;
    private final Map<String, String> frameworkProperties;
 
    private List<EmbeddedEquinoxLifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<EmbeddedEquinoxLifecycleListener>();
 
    public EmbeddedEquinox(FrameworkLocationProvider frameworkLocationProvider, StartLevelProvider startLevelProvider,
-      BundleStartPolicyProvider bundleStartPolicyProvider, Iterable2<URI, ? extends Exception> bundleURIs,
+      BundleStartPolicyProvider bundleStartPolicyProvider, BundleProvider<? extends Exception> bundleProvider,
       Map<String, String> frameworkProperties)
    {
       this.frameworkLocationProvider = frameworkLocationProvider;
       this.startLevelProvider = startLevelProvider;
       this.bundleStartPolicyProvider = bundleStartPolicyProvider;
-      this.bundleURIs = bundleURIs;
+      this.bundleProvider = bundleProvider;
       this.frameworkProperties = frameworkProperties;
    }
 
@@ -92,11 +99,39 @@ public class EmbeddedEquinox
       }
 
       final Map<String, String> frameworkProerties = new HashMap<String, String>(frameworkProperties);
-
       frameworkProerties.put("osgi.install.area", frameworkLocation.getAbsolutePath().toString());
       frameworkProerties.put("osgi.configuration.area", new File(frameworkLocation, "configuration").getAbsolutePath());
 
-      FrameworkFactory frameworkFactory = new EquinoxFactory();
+      final ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration();
+      final List<String> classNamePatterns = classLoaderConfiguration.getClassNamePatterns();
+      classNamePatterns.add("org.osgi.**");
+      classNamePatterns.add(IProgressMonitor.class.getName());
+      classNamePatterns.add(IStatus.class.getName());
+      classNamePatterns.add(CoreException.class.getName());
+      classNamePatterns.add("org.eclipse.equinox.p2.core.*");
+      classNamePatterns.add("org.eclipse.equinox.p2.metadata.*");
+      classNamePatterns.add("org.eclipse.equinox.p2.repository.*");
+      classNamePatterns.add("org.eclipse.equinox.p2.repository.metadata.*");
+      classNamePatterns.add("org.eclipse.equinox.p2.repository.artifact.*");
+      classNamePatterns.add("org.eclipse.equinox.p2.metadata.expression.*");
+      classNamePatterns.add("org.eclipse.equinox.p2.query.*");
+
+      final ClassLoaderFactory classLoaderFactory = new ClassLoaderFactory();
+
+      final ClassLoader foreignClassLoader = getClass().getClassLoader();
+      final ClassLoader frameworkClassLoader;
+      try
+      {
+         frameworkClassLoader = classLoaderFactory.newFrameworkClassLoader(bundleProvider.getFrameworkJARs(),
+            classLoaderConfiguration, foreignClassLoader);
+      }
+      catch (Exception e)
+      {
+         throw pipe(e);
+      }
+
+      final FrameworkFactory frameworkFactory = newFrameworkFactory(frameworkClassLoader);
+
       framework = frameworkFactory.newFramework(frameworkProerties);
       try
       {
@@ -116,7 +151,7 @@ public class EmbeddedEquinox
 
       try
       {
-         foreach(bundleURIs, new InstallBundle(bundleContext));
+         foreach(bundleProvider.getBundleJARs(), new InstallBundle(bundleContext));
       }
       catch (Exception e)
       {
@@ -256,5 +291,28 @@ public class EmbeddedEquinox
    public BundleContext getBundleContext()
    {
       return framework.getBundleContext();
+   }
+
+   private static FrameworkFactory newFrameworkFactory(final ClassLoader classLoader)
+   {
+      final FromStream<FrameworkFactory> fromStream = new FromStream<FrameworkFactory>()
+      {
+         @Override
+         public FrameworkFactory read(InputStream inputStream) throws Exception
+         {
+            final BufferedReader r = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            for (String s = r.readLine(); s != null; s = r.readLine())
+            {
+               s = s.trim();
+               // Try to load first non-empty, non-commented line.
+               if ((s.length() > 0) && (s.charAt(0) != '#'))
+               {
+                  return (FrameworkFactory) classLoader.loadClass(s).newInstance();
+               }
+            }
+            return null;
+         }
+      };
+      return read(fromStream, cpIn(classLoader, "META-INF/services/org.osgi.framework.launch.FrameworkFactory"));
    }
 }

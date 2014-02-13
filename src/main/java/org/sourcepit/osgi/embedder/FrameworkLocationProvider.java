@@ -4,8 +4,14 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
-public enum BundleStartPolicy
+package org.sourcepit.osgi.embedder;
+
+import java.io.File;
+import java.io.IOException;
+
+public interface FrameworkLocationProvider
 {
-   FORCE_START, BY_ACTIVATION_POLICY, DONT_START
+   File aquireFrameworkLocation() throws IOException;
+
+   void releaseFrameworkLocation(File frameworkLocation) throws IOException;
 }

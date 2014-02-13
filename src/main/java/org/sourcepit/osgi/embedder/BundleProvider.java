@@ -4,12 +4,16 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
+package org.sourcepit.osgi.embedder;
 
-import org.osgi.framework.Bundle;
+import java.net.URL;
 
+import org.sourcepit.common.utils.collections.Iterable2;
 
-public interface BundleStartPolicyProvider
+public interface BundleProvider<E extends Exception>
 {
-   BundleStartPolicy getStartPolicy(Bundle bundle);
+   Iterable2<URL, E> getFrameworkJARs() throws E;
+
+   Iterable2<URL, E> getBundleJARs() throws E;
+
 }

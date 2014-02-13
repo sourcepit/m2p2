@@ -4,14 +4,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
+package org.sourcepit.osgi.embedder;
 
-import java.io.File;
-import java.io.IOException;
+import org.osgi.framework.launch.Framework;
 
-public interface FrameworkLocationProvider
+public interface StartLevelProvider extends BundleStartLevelProvider
 {
-   File aquireFrameworkLocation() throws IOException;
-
-   void releaseFrameworkLocation(File frameworkLocation) throws IOException;
+   int getFrameworkStartLevel(Framework framework);
 }

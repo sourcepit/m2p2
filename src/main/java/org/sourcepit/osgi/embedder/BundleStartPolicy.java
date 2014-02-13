@@ -4,11 +4,8 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
-
-import org.osgi.framework.launch.Framework;
-
-public interface StartLevelProvider extends BundleStartLevelProvider
+package org.sourcepit.osgi.embedder;
+public enum BundleStartPolicy
 {
-   int getFrameworkStartLevel(Framework framework);
+   FORCE_START, BY_ACTIVATION_POLICY, DONT_START
 }

@@ -29,43 +29,14 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>org.sourcepit</groupId>
-			<artifactId>guice-plexus-bridge</artifactId>
-			<version>0.1.0-alpha-7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.sourcepit</groupId>
-			<artifactId>slf4j-plexus</artifactId>
-			<version>0.1.0-alpha-4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
-			<artifactId>maven-plugin-tools-annotations</artifactId>
-			<version>3.2</version>
+			<artifactId>maven-plugin-annotations</artifactId>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.sourcepit.common</groupId>
-			<artifactId>common-utils</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.sourcepit.common</groupId>
-			<artifactId>common-maven</artifactId>
-			<version>0.1.0-alpha-12</version>
 		</dependency>
 
 		<dependency>
@@ -99,9 +70,90 @@
 			<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
 			<version>1.1.200-v20130515-2028</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.sourcepit</groupId>
+			<artifactId>guice-plexus-bridge</artifactId>
+			<version>0.1.0-alpha-7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.sourcepit</groupId>
+			<artifactId>slf4j-plexus</artifactId>
+			<version>0.1.0-alpha-4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.sourcepit.common</groupId>
+			<artifactId>common-utils</artifactId>
+			<version>0.1.0-alpha-9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.sourcepit.common</groupId>
+			<artifactId>common-maven</artifactId>
+			<version>0.1.0-alpha-13</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-embedder</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-compat</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.aether</groupId>
+			<artifactId>aether-connector-wagon</artifactId>
+			<version>1.13.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-file</artifactId>
+			<version>2.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-http</artifactId>
+			<version>2.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.sourcepit.common</groupId>
+			<artifactId>common-testing</artifactId>
+			<version>0.1.0-alpha-8</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>srcpit.org.eclipse.emf</groupId>
+			<artifactId>org.eclipse.emf.ecore.xmi</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -134,7 +186,7 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>

@@ -23,7 +23,7 @@ public class LoggerAdapter implements LogListener
    @Override
    public void logged(LogEntry entry)
    {
-      switch (entry.getLevel())
+      switch (getLevel(entry))
       {
          case LogService.LOG_INFO :
             logger.info(entry.getMessage(), entry.getException());
@@ -40,6 +40,20 @@ public class LoggerAdapter implements LogListener
          default :
             throw new IllegalStateException();
       }
+   }
+
+   private int getLevel(LogEntry entry)
+   {
+      if (LogService.LOG_INFO == entry.getLevel())
+      {
+         final String message = entry.getMessage();
+         if (message.startsWith("BundleEvent ") || message.startsWith("ServiceEvent ")
+            || message.startsWith("FrameworkEvent "))
+         {
+            return LogService.LOG_DEBUG;
+         }
+      }
+      return entry.getLevel();
    }
 
 }

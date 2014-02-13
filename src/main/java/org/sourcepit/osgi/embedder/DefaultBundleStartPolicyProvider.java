@@ -4,11 +4,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
+package org.sourcepit.osgi.embedder;
 
-import static org.sourcepit.m2p2.core.BundleStartPolicy.BY_ACTIVATION_POLICY;
-import static org.sourcepit.m2p2.core.BundleStartPolicy.DONT_START;
-import static org.sourcepit.m2p2.core.BundleStartPolicy.FORCE_START;
+import static org.sourcepit.osgi.embedder.BundleStartPolicy.BY_ACTIVATION_POLICY;
+import static org.sourcepit.osgi.embedder.BundleStartPolicy.DONT_START;
+import static org.sourcepit.osgi.embedder.BundleStartPolicy.FORCE_START;
 
 import java.util.Map;
 

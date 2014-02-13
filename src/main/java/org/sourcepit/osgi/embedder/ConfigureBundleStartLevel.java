@@ -4,7 +4,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.core;
+package org.sourcepit.osgi.embedder;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.startlevel.BundleStartLevel;
@@ -22,7 +22,10 @@ public class ConfigureBundleStartLevel implements Functor<Bundle, RuntimeExcepti
    @Override
    public void apply(Bundle bundle)
    {
-      final int startLevel = startLevelProvider.getBundleStartLevel(bundle);
-      bundle.adapt(BundleStartLevel.class).setStartLevel(startLevel);
+      if (bundle.getBundleId() != 0L)
+      {
+         final int startLevel = startLevelProvider.getBundleStartLevel(bundle);
+         bundle.adapt(BundleStartLevel.class).setStartLevel(startLevel);
+      }
    }
 }
