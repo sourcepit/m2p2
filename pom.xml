@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.sourcepit</groupId>
 		<artifactId>srcpit-parent</artifactId>
-		<version>10</version>
+		<version>11-SNAPSHOT</version>
 	</parent>
 	<groupId>org.sourcepit.m2p2</groupId>
 	<artifactId>m2p2</artifactId>
@@ -14,6 +14,7 @@
 	<modules>
 		<module>m2p2-osgi-embedder</module>
 		<module>m2p2-osgi-embedder-maven</module>
+		<module>m2p2-director-maven-plugin</module>
 	</modules>
 
 	<repositories>
@@ -28,6 +29,11 @@
 			<dependency>
 				<groupId>org.sourcepit.m2p2</groupId>
 				<artifactId>m2p2-osgi-embedder</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sourcepit.m2p2</groupId>
+				<artifactId>m2p2-osgi-embedder-maven</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
