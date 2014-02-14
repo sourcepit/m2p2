@@ -26,7 +26,6 @@ import javax.inject.Named;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogReaderService;
 import org.slf4j.Logger;
@@ -40,7 +39,10 @@ import org.sourcepit.m2p2.equinox.EmbeddedEquinox;
 import org.sourcepit.m2p2.equinox.EmbeddedEquinoxLifecycleListener;
 import org.sourcepit.osgi.embedder.BundleProvider;
 import org.sourcepit.osgi.embedder.BundleStartPolicyProvider;
+import org.sourcepit.osgi.embedder.ClassLoadingStrategy;
 import org.sourcepit.osgi.embedder.FrameworkLocationProvider;
+import org.sourcepit.osgi.embedder.ParentFirstClassLoadingStrategy;
+import org.sourcepit.osgi.embedder.SharedClassesAndResources;
 import org.sourcepit.osgi.embedder.StartConfiguration;
 import org.sourcepit.osgi.embedder.StartLevelProvider;
 import org.sourcepit.osgi.embedder.TempFrameworkLocationProvider;
@@ -61,14 +63,11 @@ public class MavenEquinoxFactory
       final StartLevelProvider startLevelProvider = toStartLevelProvider(startCfg);
       final BundleStartPolicyProvider bundleStartPolicyProvider = toBundleStartPolicyProvider(startCfg);
 
-      Map<String, String> frameworkProerties = new HashMap<String, String>();
-      frameworkProerties.put("osgi.parentClassloader", "fwk");
-      // frameworkProerties.put(Constants.FRAMEWORK_BUNDLE_PARENT, Constants.FRAMEWORK_BUNDLE_PARENT_FRAMEWORK);
-      frameworkProerties.put(Constants.FRAMEWORK_BOOTDELEGATION, "*");
-      // "org.eclipse.core.net.proxy,org.eclipse.core.net.proxy.*,org.eclipse.equinox.p2.core,org.eclipse.equinox.p2.core.spi,org.eclipse.equinox.p2.repository.metadata,org.eclipse.equinox.internal.p2.metadata.repository,org.eclipse.equinox.internal.provisional.p2.core.eventbus,org.eclipse.equinox.internal.p2.repository,org.eclipse.core.runtime.preferences");
+      final SharedClassesAndResources sharedClassesAndResources = SharedClassesAndResources.fromProperties(
+         configuration, "m2p2");
 
-      // org.osgi.framework.bootdelegation=sun.*,com.sun.*
-      // frameworkProerties.put(Constants.FRAMEWORK_BOOTDELEGATION, null);
+      final ClassLoadingStrategy classLoadingStrategy = new ParentFirstClassLoadingStrategy(
+         getClass().getClassLoader(), sharedClassesAndResources);
 
       final FrameworkLocationProvider frameworkLocationProvider = new TempFrameworkLocationProvider();
       final List<ArtifactKey> frameworkArtifacts = getArtifacts(configuration, "m2p2.frameworkArtifacts");
@@ -77,8 +76,9 @@ public class MavenEquinoxFactory
       final BundleProvider<DependencyResolutionException> bundleProvider = new MavenBundleProvider(artifactResolver,
          session, frameworkArtifacts, bundleArtifacts);
 
+      Map<String, String> frameworkProperties = new HashMap<String, String>();
       final EmbeddedEquinox embeddedEquinox = new EmbeddedEquinox(frameworkLocationProvider, startLevelProvider,
-         bundleStartPolicyProvider, bundleProvider, frameworkProerties);
+         bundleStartPolicyProvider, bundleProvider, frameworkProperties, classLoadingStrategy);
 
       embeddedEquinox.addLifecycleListener(new EmbeddedEquinoxLifecycleListener()
       {

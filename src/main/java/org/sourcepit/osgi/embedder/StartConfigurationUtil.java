@@ -61,7 +61,7 @@ public final class StartConfigurationUtil
       return startCfg;
    }
 
-   private static String getPrefixedProperty(String prefix, String property)
+   static String getPrefixedProperty(String prefix, String property)
    {
       if (prefix == null || prefix.isEmpty())
       {

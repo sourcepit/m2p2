@@ -24,9 +24,6 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -41,6 +38,7 @@ import org.sourcepit.common.utils.io.Read.FromStream;
 import org.sourcepit.common.utils.lang.ThrowablePipe;
 import org.sourcepit.osgi.embedder.BundleProvider;
 import org.sourcepit.osgi.embedder.BundleStartPolicyProvider;
+import org.sourcepit.osgi.embedder.ClassLoadingStrategy;
 import org.sourcepit.osgi.embedder.ConfigureBundleStartLevel;
 import org.sourcepit.osgi.embedder.FrameworkLocationProvider;
 import org.sourcepit.osgi.embedder.InstallBundle;
@@ -54,18 +52,20 @@ public class EmbeddedEquinox
    private final BundleStartPolicyProvider bundleStartPolicyProvider;
    private final BundleProvider<? extends Exception> bundleProvider;
    private final Map<String, String> frameworkProperties;
+   private final ClassLoadingStrategy classLoadingStrategy;
 
    private List<EmbeddedEquinoxLifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<EmbeddedEquinoxLifecycleListener>();
 
    public EmbeddedEquinox(FrameworkLocationProvider frameworkLocationProvider, StartLevelProvider startLevelProvider,
       BundleStartPolicyProvider bundleStartPolicyProvider, BundleProvider<? extends Exception> bundleProvider,
-      Map<String, String> frameworkProperties)
+      Map<String, String> frameworkProperties, ClassLoadingStrategy classLoadingStrategy)
    {
       this.frameworkLocationProvider = frameworkLocationProvider;
       this.startLevelProvider = startLevelProvider;
       this.bundleStartPolicyProvider = bundleStartPolicyProvider;
       this.bundleProvider = bundleProvider;
       this.frameworkProperties = frameworkProperties;
+      this.classLoadingStrategy = classLoadingStrategy;
    }
 
    public void addLifecycleListener(EmbeddedEquinoxLifecycleListener lifecycleListener)
@@ -81,6 +81,8 @@ public class EmbeddedEquinox
    private boolean started;
 
    private File frameworkLocation;
+
+   private ClassLoader frameworkClassLoader;
 
    private Framework framework;
 
@@ -102,28 +104,11 @@ public class EmbeddedEquinox
       frameworkProerties.put("osgi.install.area", frameworkLocation.getAbsolutePath().toString());
       frameworkProerties.put("osgi.configuration.area", new File(frameworkLocation, "configuration").getAbsolutePath());
 
-      final ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration();
-      final List<String> classNamePatterns = classLoaderConfiguration.getClassNamePatterns();
-      classNamePatterns.add("org.osgi.**");
-      classNamePatterns.add(IProgressMonitor.class.getName());
-      classNamePatterns.add(IStatus.class.getName());
-      classNamePatterns.add(CoreException.class.getName());
-      classNamePatterns.add("org.eclipse.equinox.p2.core.*");
-      classNamePatterns.add("org.eclipse.equinox.p2.metadata.*");
-      classNamePatterns.add("org.eclipse.equinox.p2.repository.*");
-      classNamePatterns.add("org.eclipse.equinox.p2.repository.metadata.*");
-      classNamePatterns.add("org.eclipse.equinox.p2.repository.artifact.*");
-      classNamePatterns.add("org.eclipse.equinox.p2.metadata.expression.*");
-      classNamePatterns.add("org.eclipse.equinox.p2.query.*");
+      classLoadingStrategy.adoptFrameworkProperties(frameworkProerties);
 
-      final ClassLoaderFactory classLoaderFactory = new ClassLoaderFactory();
-
-      final ClassLoader foreignClassLoader = getClass().getClassLoader();
-      final ClassLoader frameworkClassLoader;
       try
       {
-         frameworkClassLoader = classLoaderFactory.newFrameworkClassLoader(bundleProvider.getFrameworkJARs(),
-            classLoaderConfiguration, foreignClassLoader);
+         frameworkClassLoader = classLoadingStrategy.newFrameworkClassLoader(bundleProvider.getFrameworkJARs());
       }
       catch (Exception e)
       {
@@ -269,13 +254,27 @@ public class EmbeddedEquinox
       }
       finally
       {
-         if (frameworkLocation != null)
+         try
          {
-            try
+            if (frameworkLocation != null)
             {
                frameworkLocationProvider.releaseFrameworkLocation(frameworkLocation);
             }
-            catch (IOException e)
+         }
+         catch (Exception e)
+         {
+            errors.add(e);
+         }
+         finally
+         {
+            try
+            {
+               if (frameworkClassLoader != null)
+               {
+                  classLoadingStrategy.disposeFrameworkClassLoader(frameworkClassLoader);
+               }
+            }
+            catch (Exception e)
             {
                errors.add(e);
             }

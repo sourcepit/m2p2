@@ -4,7 +4,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.m2p2.equinox;
+package org.sourcepit.osgi.embedder;
 
 import java.io.IOException;
 import java.io.InputStream;
