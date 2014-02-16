@@ -17,13 +17,6 @@
 		<module>m2p2-director-maven-plugin</module>
 	</modules>
 
-	<repositories>
-		<repository>
-			<id>p2</id>
-			<url>file:D:/src/e43/ws/org.sourcepit.eclipse.artifacts.feature/target/repo</url>
-		</repository>
-	</repositories>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
