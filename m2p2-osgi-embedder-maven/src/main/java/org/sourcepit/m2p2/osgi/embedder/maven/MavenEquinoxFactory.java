@@ -6,13 +6,11 @@
 
 package org.sourcepit.m2p2.osgi.embedder.maven;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.sourcepit.common.maven.model.util.MavenModelUtils.parseArtifactKey;
 import static org.sourcepit.m2p2.osgi.embedder.StartConfigurationUtil.fromProperties;
 import static org.sourcepit.m2p2.osgi.embedder.StartConfigurationUtil.toBundleStartPolicyProvider;
 import static org.sourcepit.m2p2.osgi.embedder.StartConfigurationUtil.toStartLevelProvider;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -32,8 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sourcepit.common.maven.model.ArtifactKey;
-import org.sourcepit.common.utils.props.LinkedPropertiesMap;
-import org.sourcepit.common.utils.props.PropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesSource;
 import org.sourcepit.m2p2.osgi.embedder.BundleProvider;
 import org.sourcepit.m2p2.osgi.embedder.BundleStartPolicyProvider;
@@ -55,10 +51,8 @@ public class MavenEquinoxFactory
 
    private Logger log = LoggerFactory.getLogger(MavenEquinoxFactory.class);
 
-   public OSGiEmbedder create(MavenSession session) throws MavenExecutionException
+   public OSGiEmbedder create(MavenSession session, PropertiesSource configuration) throws MavenExecutionException
    {
-      final PropertiesMap configuration = readConfig();
-
       final StartConfiguration startCfg = fromProperties(configuration, "m2p2");
       final StartLevelProvider startLevelProvider = toStartLevelProvider(startCfg);
       final BundleStartPolicyProvider bundleStartPolicyProvider = toBundleStartPolicyProvider(startCfg);
@@ -129,21 +123,5 @@ public class MavenEquinoxFactory
          artifacts.add(parseArtifactKey(bundleArtifact.trim()).getArtifactKey());
       }
       return new ArrayList<ArtifactKey>(artifacts);
-   }
-
-   private PropertiesMap readConfig()
-   {
-      final PropertiesMap propertiesMap = new LinkedPropertiesMap();
-      InputStream in = null;
-      try
-      {
-         in = getClass().getResourceAsStream("osgi.properties");
-         propertiesMap.load(in);
-      }
-      finally
-      {
-         closeQuietly(in);
-      }
-      return propertiesMap;
    }
 }
