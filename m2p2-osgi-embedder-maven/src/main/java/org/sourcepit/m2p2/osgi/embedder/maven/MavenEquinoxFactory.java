@@ -31,12 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sourcepit.common.maven.model.ArtifactKey;
 import org.sourcepit.common.utils.props.PropertiesSource;
+import org.sourcepit.m2p2.osgi.embedder.AbstractOSGiEmbedderLifecycleListener;
 import org.sourcepit.m2p2.osgi.embedder.BundleProvider;
 import org.sourcepit.m2p2.osgi.embedder.BundleStartPolicyProvider;
 import org.sourcepit.m2p2.osgi.embedder.ClassLoadingStrategy;
 import org.sourcepit.m2p2.osgi.embedder.FrameworkLocationProvider;
 import org.sourcepit.m2p2.osgi.embedder.OSGiEmbedder;
-import org.sourcepit.m2p2.osgi.embedder.OSGiEmbedderLifecycleListener;
 import org.sourcepit.m2p2.osgi.embedder.ParentFirstClassLoadingStrategy;
 import org.sourcepit.m2p2.osgi.embedder.SharedClassesAndResources;
 import org.sourcepit.m2p2.osgi.embedder.StartConfiguration;
@@ -74,7 +74,7 @@ public class MavenEquinoxFactory
       final OSGiEmbedder embeddedEquinox = new OSGiEmbedder(frameworkLocationProvider, startLevelProvider,
          bundleStartPolicyProvider, bundleProvider, frameworkProperties, classLoadingStrategy);
 
-      embeddedEquinox.addLifecycleListener(new OSGiEmbedderLifecycleListener()
+      embeddedEquinox.addLifecycleListener(new AbstractOSGiEmbedderLifecycleListener()
       {
 
          @Override
@@ -89,26 +89,6 @@ public class MavenEquinoxFactory
                LogReaderService logService = bundleContext.getService(reference);
                logService.addLogListener(new LoggerAdapter(log));
             }
-         }
-
-         @Override
-         public void bundlesInstalled(OSGiEmbedder embeddedEquinox)
-         {
-         }
-
-         @Override
-         public void bundlesStarted(OSGiEmbedder embeddedEquinox)
-         {
-         }
-
-         @Override
-         public void frameworkAboutToStop(OSGiEmbedder embeddedEquinox)
-         {
-         }
-
-         @Override
-         public void frameworkStopped(OSGiEmbedder embeddedEquinox)
-         {
          }
       });
 

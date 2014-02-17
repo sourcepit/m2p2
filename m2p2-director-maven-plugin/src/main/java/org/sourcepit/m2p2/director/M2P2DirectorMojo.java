@@ -8,16 +8,12 @@ package org.sourcepit.m2p2.director;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PACKAGE;
-import static org.sourcepit.common.utils.lang.Exceptions.pipe;
 
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import org.apache.maven.MavenExecutionException;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.LegacySupport;
@@ -25,22 +21,15 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Server;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
-import org.eclipse.core.net.proxy.IProxyService;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
 import org.sourcepit.guplex.Guplex;
-import org.sourcepit.m2p2.osgi.embedder.AbstractOSGiEmbedderLifecycleListener;
 import org.sourcepit.m2p2.osgi.embedder.OSGiEmbedder;
 import org.sourcepit.m2p2.osgi.embedder.maven.MavenEquinoxFactory;
+import org.sourcepit.m2p2.osgi.embedder.maven.equinox.EquinoxEnvironmentConfigurer;
+import org.sourcepit.m2p2.osgi.embedder.maven.equinox.EquinoxProxyConfigurer;
+import org.sourcepit.m2p2.osgi.embedder.maven.equinox.P2RepositoryCredentialsConfigurer;
 
 @Mojo(name = "install", defaultPhase = PACKAGE, requiresProject = false)
 public class M2P2DirectorMojo extends AbstractMojo
@@ -88,75 +77,11 @@ public class M2P2DirectorMojo extends AbstractMojo
          throw new MojoExecutionException("Failed to create OSGi embedder.", e);
       }
 
-      embedder.addLifecycleListener(new AbstractOSGiEmbedderLifecycleListener()
-      {
-         @Override
-         public void bundlesStarted(OSGiEmbedder embeddedEquinox)
-         {
-            final BundleContext bundleContext = embeddedEquinox.getBundleContext();
-
-            final IProxyService proxyService = getService(bundleContext, IProxyService.class);
-
-            try
-            {
-               MavenProxies.applyMavenProxies(proxyService, settingsDecrypter, session.getSettings().getProxies());
-            }
-            catch (CoreException e)
-            {
-               throw pipe(e);
-            }
-
-            final ISecurePreferences securePreferences = getSecurePreferences(bundleContext);
-
-            final MavenProject mavenProject = session.getCurrentProject();
-            final List<ArtifactRepository> repositories = mavenProject.getRemoteArtifactRepositories();
-            final LogService logger = getService(bundleContext, LogService.class);
-            final List<Server> servers = session.getSettings().getServers();
-
-            MavenRepositories.applyMavenP2Repositories(securePreferences, settingsDecrypter, servers, repositories,
-               logger);
-         }
-
-         private ISecurePreferences getSecurePreferences(final BundleContext bundleContext)
-         {
-            try
-            {
-               final Class<?> clazz = getBundle(bundleContext, "org.eclipse.equinox.security").loadClass(
-                  SecurePreferencesFactory.class.getName());
-               return (ISecurePreferences) clazz.getMethod("getDefault").invoke(null);
-            }
-            catch (ClassNotFoundException e)
-            {
-               throw pipe(e);
-            }
-            catch (IllegalAccessException e)
-            {
-               throw pipe(e);
-            }
-            catch (InvocationTargetException e)
-            {
-               throw pipe(e);
-            }
-            catch (NoSuchMethodException e)
-            {
-               throw pipe(e);
-            }
-         }
-      });
+      embedder.addLifecycleListener(new EquinoxEnvironmentConfigurer());
+      embedder.addLifecycleListener(new EquinoxProxyConfigurer(buildContext, settingsDecrypter));
+      embedder.addLifecycleListener(new P2RepositoryCredentialsConfigurer(buildContext, settingsDecrypter));
 
       return embedder;
-   }
-
-   private static Bundle getBundle(BundleContext bundleContext, String symbolicName)
-   {
-      for (Bundle bundle : bundleContext.getBundles())
-      {
-         if (symbolicName.equals(bundle.getSymbolicName()))
-         {
-            return bundle;
-         }
-      }
-      return null;
    }
 
    private PropertiesMap readEmbedderConfiguration()
@@ -173,11 +98,6 @@ public class M2P2DirectorMojo extends AbstractMojo
          closeQuietly(in);
       }
       return propertiesMap;
-   }
-
-   private static <S> S getService(BundleContext context, Class<S> serviceType)
-   {
-      return context.getService(context.getServiceReference(serviceType));
    }
 
 }

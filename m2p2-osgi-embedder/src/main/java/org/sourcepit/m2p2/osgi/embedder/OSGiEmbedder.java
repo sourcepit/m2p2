@@ -18,16 +18,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
-import org.eclipse.core.runtime.internal.adaptor.EclipseEnvironmentInfo;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -96,26 +92,16 @@ public class OSGiEmbedder
          throw pipe(e);
       }
 
-      final Collection<String> nonFrameworkArgs = new LinkedHashSet<String>();
-      nonFrameworkArgs.add("-eclipse.keyring");
-      final File secureStorage = new File(frameworkLocation, "secure_storage");
-      try
-      {
-         secureStorage.createNewFile();
-      }
-      catch (IOException e)
-      {
-         throw pipe(e);
-      }
-
-      secureStorage.deleteOnExit();
-      nonFrameworkArgs.add(secureStorage.getAbsolutePath());
-
       final Map<String, String> frameworkProerties = new HashMap<String, String>(frameworkProperties);
       frameworkProerties.put("osgi.install.area", frameworkLocation.getAbsolutePath().toString());
       frameworkProerties.put("osgi.configuration.area", new File(frameworkLocation, "configuration").getAbsolutePath());
 
       classLoadingStrategy.adoptFrameworkProperties(frameworkProerties);
+      
+      for (OSGiEmbedderLifecycleListener lifecycleListener : lifecycleListeners)
+      {
+         lifecycleListener.frameworkPropertiesInitialized(this, frameworkProerties);
+      }
 
       try
       {
@@ -125,8 +111,11 @@ public class OSGiEmbedder
       {
          throw pipe(e);
       }
-
-      setNonFrameworkArgs(frameworkClassLoader, nonFrameworkArgs);
+      
+      for (OSGiEmbedderLifecycleListener lifecycleListener : lifecycleListeners)
+      {
+         lifecycleListener.frameworkClassLoaderCreated(this, frameworkClassLoader);
+      }
 
       final FrameworkFactory frameworkFactory = newFrameworkFactory(frameworkClassLoader);
 
@@ -299,6 +288,11 @@ public class OSGiEmbedder
 
       errors.throwPipe();
    }
+   
+   public File getFrameworkLocation()
+   {
+      return frameworkLocation;
+   }
 
    public BundleContext getBundleContext()
    {
@@ -326,36 +320,5 @@ public class OSGiEmbedder
          }
       };
       return read(fromStream, cpIn(classLoader, "META-INF/services/org.osgi.framework.launch.FrameworkFactory"));
-   }
-
-   private static void setNonFrameworkArgs(ClassLoader frameworkClassLoader, final Collection<String> nonFrameworkArgs)
-   {
-      Class<?> clazz;
-      try
-      {
-         clazz = frameworkClassLoader.loadClass(EclipseEnvironmentInfo.class.getName());
-      }
-      catch (ClassNotFoundException e)
-      {
-         throw pipe(e);
-      }
-
-      final Object appArgs = nonFrameworkArgs.toArray(new String[nonFrameworkArgs.size()]);
-      try
-      {
-         clazz.getMethod("setAppArgs", String[].class).invoke(null, appArgs);
-      }
-      catch (IllegalAccessException e)
-      {
-         throw pipe(e);
-      }
-      catch (InvocationTargetException e)
-      {
-         throw pipe(e);
-      }
-      catch (NoSuchMethodException e)
-      {
-         throw pipe(e);
-      }
    }
 }

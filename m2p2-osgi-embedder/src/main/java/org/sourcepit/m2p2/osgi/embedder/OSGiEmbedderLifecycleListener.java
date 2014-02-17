@@ -5,8 +5,15 @@
  */
 
 package org.sourcepit.m2p2.osgi.embedder;
+
+import java.util.Map;
+
 public interface OSGiEmbedderLifecycleListener
 {
+   void frameworkPropertiesInitialized(OSGiEmbedder embeddedEquinox, Map<String, String> frameworkProperties);
+
+   void frameworkClassLoaderCreated(OSGiEmbedder embeddedEquinox, ClassLoader frameworkClassLoader);
+
    void frameworkStarted(OSGiEmbedder embeddedEquinox);
 
    void bundlesInstalled(OSGiEmbedder embeddedEquinox);

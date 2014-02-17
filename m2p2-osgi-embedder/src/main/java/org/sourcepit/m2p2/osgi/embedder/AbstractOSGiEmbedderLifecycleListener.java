@@ -5,8 +5,20 @@
  */
 
 package org.sourcepit.m2p2.osgi.embedder;
+
+import java.util.Map;
+
 public abstract class AbstractOSGiEmbedderLifecycleListener implements OSGiEmbedderLifecycleListener
 {
+   @Override
+   public void frameworkPropertiesInitialized(OSGiEmbedder embeddedEquinox, Map<String, String> frameworkProperties)
+   {
+   }
+
+   @Override
+   public void frameworkClassLoaderCreated(OSGiEmbedder embeddedEquinox, ClassLoader frameworkClassLoader)
+   {
+   }
 
    @Override
    public void frameworkStarted(OSGiEmbedder embeddedEquinox)

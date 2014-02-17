@@ -8,6 +8,7 @@ package org.sourcepit.m2p2.osgi.embedder.maven;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -23,6 +24,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.query.IQueryResult;
@@ -41,6 +43,8 @@ import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
 import org.sourcepit.m2p2.osgi.embedder.OSGiEmbedder;
 import org.sourcepit.m2p2.osgi.embedder.maven.MavenEquinoxFactory;
+import org.sourcepit.m2p2.osgi.embedder.maven.equinox.EquinoxEnvironmentConfigurer;
+import org.sourcepit.m2p2.osgi.embedder.maven.equinox.EquinoxProxyConfigurer;
 
 
 public class P2Test extends EmbeddedMavenEnvironmentTest
@@ -50,6 +54,9 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
 
    @Inject
    private RepositorySystem repositorySystem;
+   
+   @Inject
+   private SettingsDecrypter settingsDecrypter;
 
    @Inject
    private MavenEquinoxFactory mavenEquinoxFactory;
@@ -90,6 +97,20 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
          }
       };
    }
+   
+   @Override
+   protected File getUserHome()
+   {
+      // TODO Auto-generated method stub
+      return super.getUserHome();
+   }
+   
+   @Override
+   protected File getUserSettingsFile()
+   {
+      // TODO Auto-generated method stub
+      return super.getUserSettingsFile();
+   }
 
    @Override
    @Before
@@ -99,17 +120,25 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
       MavenExecutionResult2 result = buildStubProject(ws.getRoot());
       buildContext.setSession(result.getSession());
 
-      ArtifactRepository repo = repositorySystem.createArtifactRepository("srcpit-thirdparty",
-         "http://nexus.sourcepit.org/content/repositories/thirdparty/", null, null, null);
+      ArtifactRepository repo = repositorySystem.createArtifactRepository("srcpit-public",
+         "http://nexus.sourcepit.org/content/groups/public/", null, null, null);
 
       MavenProject project = buildContext.getSession().getCurrentProject();
       List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
       repos.add(repo);
+      
+      repositorySystem.injectAuthentication(repos, buildContext.getSession().getSettings().getServers());
+      repositorySystem.injectProxy(repos, buildContext.getSession().getSettings().getProxies());
+      
       project.setRemoteArtifactRepositories(repos);
 
       final PropertiesMap configuration = readConfig();
 
       equinox = mavenEquinoxFactory.create(buildContext.getSession(), configuration);
+      
+      equinox.addLifecycleListener(new EquinoxEnvironmentConfigurer());
+      equinox.addLifecycleListener(new EquinoxProxyConfigurer(buildContext, settingsDecrypter));
+      
       equinox.start();
 
       BundleContext bundleContext = equinox.getBundleContext();

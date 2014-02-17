@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Bosch Software Innovations GmbH. All rights reserved.
  */
 
-package org.sourcepit.m2p2.director;
+package org.sourcepit.m2p2.osgi.embedder.maven.equinox;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;

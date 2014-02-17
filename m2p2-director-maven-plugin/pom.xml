@@ -20,7 +20,11 @@
 			<artifactId>org.eclipse.core.net</artifactId>
 			<version>1.2.200-v20130430-1352</version>
 		</dependency>
-
+        <dependency>
+            <groupId>srcpit.org.eclipse.equinox</groupId>
+            <artifactId>org.eclipse.equinox.security</artifactId>
+            <version>1.2.0-v20130424-1801</version>
+        </dependency>
 		<dependency>
 			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
 			<artifactId>org.eclipse.equinox.p2.metadata.repository</artifactId>
