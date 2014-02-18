@@ -22,6 +22,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
+import org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher;
+import org.eclipse.osgi.service.runnable.ApplicationLauncher;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
 import org.sourcepit.guplex.Guplex;
@@ -55,7 +59,17 @@ public class M2P2DirectorMojo extends AbstractMojo
       embedder.start();
       try
       {
-
+         final BundleContext bundleContext = embedder.getBundleContext();
+         final EclipseAppLauncher appLauncher = new EclipseAppLauncher(bundleContext, false, true, null);
+         final ServiceRegistration<?> registration = bundleContext.registerService(ApplicationLauncher.class.getName(),
+            appLauncher, null);
+         appLauncher.start(null);
+         registration.unregister();
+         appLauncher.shutdown();
+      }
+      catch (Exception e)
+      {
+         throw new MojoExecutionException("Failed to launch eclipse application.", e);
       }
       finally
       {

@@ -20,11 +20,11 @@
 			<artifactId>org.eclipse.core.net</artifactId>
 			<version>1.2.200-v20130430-1352</version>
 		</dependency>
-        <dependency>
-            <groupId>srcpit.org.eclipse.equinox</groupId>
-            <artifactId>org.eclipse.equinox.security</artifactId>
-            <version>1.2.0-v20130424-1801</version>
-        </dependency>
+		<dependency>
+			<groupId>srcpit.org.eclipse.equinox</groupId>
+			<artifactId>org.eclipse.equinox.security</artifactId>
+			<version>1.2.0-v20130424-1801</version>
+		</dependency>
 		<dependency>
 			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
 			<artifactId>org.eclipse.equinox.p2.metadata.repository</artifactId>
@@ -34,6 +34,16 @@
 			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
 			<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
 			<version>1.1.200-v20130515-2028</version>
+		</dependency>
+		<dependency>
+			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<artifactId>org.eclipse.equinox.p2.director</artifactId>
+			<version>2.3.0-v20130526-0335</version>
+		</dependency>
+		<dependency>
+			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<artifactId>org.eclipse.equinox.p2.director.app</artifactId>
+			<version>1.0.300-v20130819-1621</version>
 		</dependency>
 
 		<dependency>

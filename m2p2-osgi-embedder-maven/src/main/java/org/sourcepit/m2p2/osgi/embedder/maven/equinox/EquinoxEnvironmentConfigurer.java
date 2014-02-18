@@ -37,6 +37,9 @@ public class EquinoxEnvironmentConfigurer extends AbstractOSGiEmbedderLifecycleL
       secureStorage.deleteOnExit();
       nonFrameworkArgs.add(secureStorage.getAbsolutePath());
       
+      nonFrameworkArgs.add("-application");
+      nonFrameworkArgs.add("org.eclipse.equinox.p2.director");
+      
       setNonFrameworkArgs(frameworkClassLoader, nonFrameworkArgs);
    }
 
