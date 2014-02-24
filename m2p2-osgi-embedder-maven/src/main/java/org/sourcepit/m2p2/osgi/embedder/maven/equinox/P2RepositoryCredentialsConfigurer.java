@@ -6,9 +6,9 @@
 
 package org.sourcepit.m2p2.osgi.embedder.maven.equinox;
 
-import static org.sourcepit.common.utils.lang.Exceptions.pipe;
+import static org.sourcepit.m2p2.osgi.embedder.BundleContextUtil.getService;
+import static org.sourcepit.m2p2.osgi.embedder.maven.equinox.SecurePreferencesUtil.getSecurePreferences;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -18,8 +18,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 import org.sourcepit.m2p2.osgi.embedder.AbstractOSGiEmbedderLifecycleListener;
@@ -52,48 +50,5 @@ public class P2RepositoryCredentialsConfigurer extends AbstractOSGiEmbedderLifec
       final List<Server> servers = session.getSettings().getServers();
 
       MavenRepositories.applyMavenP2Repositories(securePreferences, settingsDecrypter, servers, repositories, logger);
-   }
-
-   private static ISecurePreferences getSecurePreferences(final BundleContext bundleContext)
-   {
-      try
-      {
-         final Class<?> clazz = getBundle(bundleContext, "org.eclipse.equinox.security").loadClass(
-            SecurePreferencesFactory.class.getName());
-         return (ISecurePreferences) clazz.getMethod("getDefault").invoke(null);
-      }
-      catch (ClassNotFoundException e)
-      {
-         throw pipe(e);
-      }
-      catch (IllegalAccessException e)
-      {
-         throw pipe(e);
-      }
-      catch (InvocationTargetException e)
-      {
-         throw pipe(e);
-      }
-      catch (NoSuchMethodException e)
-      {
-         throw pipe(e);
-      }
-   }
-
-   private static Bundle getBundle(BundleContext bundleContext, String symbolicName)
-   {
-      for (Bundle bundle : bundleContext.getBundles())
-      {
-         if (symbolicName.equals(bundle.getSymbolicName()))
-         {
-            return bundle;
-         }
-      }
-      return null;
-   }
-
-   private static <S> S getService(BundleContext context, Class<S> serviceType)
-   {
-      return context.getService(context.getServiceReference(serviceType));
    }
 }

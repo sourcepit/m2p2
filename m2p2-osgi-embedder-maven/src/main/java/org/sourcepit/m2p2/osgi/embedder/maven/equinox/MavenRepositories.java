@@ -41,28 +41,39 @@ public final class MavenRepositories
       final SettingsDecrypter settingsDecrypter, final List<Server> servers,
       final List<ArtifactRepository> repositories, LogService logger)
    {
+      final Map<String, String> repoMap = new HashMap<String, String>();
+      for (ArtifactRepository repo : repositories)
+      {
+         if ("p2".equals(repo.getLayout().getId()))
+         {
+            repoMap.put(repo.getId(), repo.getUrl());
+         }
+      }
+      return applyMavenP2Repositories(securePreferences, settingsDecrypter, servers, repoMap, logger);
+
+   }
+
+   public static Collection<URI> applyMavenP2Repositories(final ISecurePreferences securePreferences,
+      final SettingsDecrypter settingsDecrypter, final List<Server> servers, final Map<String, String> repositories,
+      LogService logger)
+   {
       final Map<String, Server> idToServerMap = new HashMap<String, Server>();
       for (Server server : servers)
       {
          server = decrypt(settingsDecrypter, server);
          idToServerMap.put(server.getId(), server);
       }
-      Map<String /* id */, ArtifactRepository> repoMap = new HashMap<String, ArtifactRepository>();
-      for (ArtifactRepository repo : repositories)
-      {
-         repoMap.put(repo.getId(), repo);
-      }
-      Map<String /* host */, Server> hostServerMap = new HashMap<String, Server>();
+
+      Map<String, Server> hostServerMap = new HashMap<String, Server>();
       try
       {
          for (String serverId : idToServerMap.keySet())
          {
-            ArtifactRepository repository = repoMap.get(serverId);
-            if (null != repository)
+            String repositoryUrl = repositories.get(serverId);
+            if (null != repositoryUrl)
             {
                Server server = idToServerMap.get(serverId);
-               String urlString = repository.getUrl();
-               URL url = new URL(urlString);
+               URL url = new URL(repositoryUrl);
                String host = url.getHost();
                hostServerMap.put(host, server);
             }
@@ -73,33 +84,28 @@ public final class MavenRepositories
          throw new RuntimeException(e);
       }
 
-
       final Collection<URI> p2Repositories = new LinkedHashSet<URI>();
-      for (ArtifactRepository repository : repositories)
+      for (String repositoryUrl : repositories.values())
       {
-         if ("p2".equals(repository.getLayout().getId()))
+         final URI uri = getURI(repositoryUrl);
+         String host = uri.getHost();
+         Server server = hostServerMap.get(host);
+         p2Repositories.add(uri);
+         if (server != null)
          {
-
-            final URI uri = getURI(repository);
-            String host = uri.getHost();
-            Server server = hostServerMap.get(host);
-            p2Repositories.add(uri);
-            if (server != null)
-            {
-               final String username = server.getUsername();
-               final String password = server.getPassword();
-               setCredentials(securePreferences, uri, username, password, logger);
-            }
+            final String username = server.getUsername();
+            final String password = server.getPassword();
+            setCredentials(securePreferences, uri, username, password, logger);
          }
       }
       return p2Repositories;
    }
 
-   private static URI getURI(ArtifactRepository repository)
+   private static URI getURI(String uri)
    {
       try
       {
-         return normalize(new URI(repository.getUrl()));
+         return normalize(new URI(uri));
       }
       catch (URISyntaxException e)
       {

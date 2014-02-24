@@ -7,6 +7,7 @@
 package org.sourcepit.m2p2.osgi.embedder.maven.equinox;
 
 import static org.sourcepit.common.utils.lang.Exceptions.pipe;
+import static org.sourcepit.m2p2.osgi.embedder.BundleContextUtil.getService;
 
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
@@ -44,10 +45,5 @@ public class EquinoxProxyConfigurer extends AbstractOSGiEmbedderLifecycleListene
       {
          throw pipe(e);
       }
-   }
-
-   private static <S> S getService(BundleContext context, Class<S> serviceType)
-   {
-      return context.getService(context.getServiceReference(serviceType));
    }
 }

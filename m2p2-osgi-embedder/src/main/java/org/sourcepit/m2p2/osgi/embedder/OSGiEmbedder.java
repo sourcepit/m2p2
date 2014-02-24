@@ -293,6 +293,11 @@ public class OSGiEmbedder
    {
       return frameworkLocation;
    }
+   
+   public ClassLoader getFrameworkClassLoader()
+   {
+      return frameworkClassLoader;
+   }
 
    public BundleContext getBundleContext()
    {
