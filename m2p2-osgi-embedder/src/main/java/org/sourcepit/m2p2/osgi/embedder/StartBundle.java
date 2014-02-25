@@ -8,6 +8,7 @@ package org.sourcepit.m2p2.osgi.embedder;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.wiring.BundleRevision;
 import org.sourcepit.common.utils.collections.Functor;
 
 public class StartBundle implements Functor<Bundle, BundleException>
@@ -22,18 +23,26 @@ public class StartBundle implements Functor<Bundle, BundleException>
    @Override
    public void apply(Bundle bundle) throws BundleException
    {
-      switch (bundleStartPolicyProvider.getStartPolicy(bundle))
+      if (!isFragment(bundle))
       {
-         case FORCE_START :
-            bundle.start();
-            break;
-         case BY_ACTIVATION_POLICY :
-            bundle.start(Bundle.START_ACTIVATION_POLICY);
-            break;
-         case DONT_START :
-            break;
-         default :
-            throw new IllegalStateException();
+         switch (bundleStartPolicyProvider.getStartPolicy(bundle))
+         {
+            case FORCE_START :
+               bundle.start();
+               break;
+            case BY_ACTIVATION_POLICY :
+               bundle.start(Bundle.START_ACTIVATION_POLICY);
+               break;
+            case DONT_START :
+               break;
+            default :
+               throw new IllegalStateException();
+         }
       }
+   }
+
+   private boolean isFragment(Bundle bundle)
+   {
+      return (bundle.adapt(BundleRevision.class).getTypes() & BundleRevision.TYPE_FRAGMENT) != 0;
    }
 }
