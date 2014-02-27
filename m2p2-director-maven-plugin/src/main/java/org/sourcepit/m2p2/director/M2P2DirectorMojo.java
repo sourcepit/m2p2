@@ -69,7 +69,6 @@ public class M2P2DirectorMojo extends AbstractMojo
    @Inject
    private SettingsDecrypter settingsDecrypter;
 
-
    // -application org.eclipse.equinox.p2.director
 
    // -repository http://download.eclipse.org/eclipse/updates/3.6
@@ -78,7 +77,7 @@ public class M2P2DirectorMojo extends AbstractMojo
 
    // -installIU org.eclipse.sdk.ide
    @Parameter(required = true)
-   private List<InstallIU> installIUs;
+   private List<String> installIUs;
 
    // -tag InitialState
    @Parameter(defaultValue = "InitialState")
@@ -113,9 +112,8 @@ public class M2P2DirectorMojo extends AbstractMojo
    private String arch;
 
    // -roaming
-   @Parameter(defaultValue = "true")
+   @Parameter(defaultValue = "false")
    private boolean roaming;
-
 
    @Override
    public void execute() throws MojoExecutionException, MojoFailureException
@@ -146,6 +144,12 @@ public class M2P2DirectorMojo extends AbstractMojo
 
          arguments.add("-profile");
          arguments.add(profile);
+         
+         if (profileProperties == null)
+         {
+            profileProperties = new Properties();
+            profileProperties.setProperty("org.eclipse.update.install.features", "true");
+         }
 
          if (profileProperties != null)
          {
@@ -181,6 +185,16 @@ public class M2P2DirectorMojo extends AbstractMojo
          {
             arguments.add("-roaming");
          }
+
+         final StringBuilder sb = new StringBuilder();
+         for (String argument : arguments)
+         {
+            sb.append(argument);
+            sb.append(' ');
+         }
+         sb.deleteCharAt(sb.length() - 1);
+         
+         getLog().info(sb.toString());
 
          // set new env args
          final EclipseEnvironmentInfo envInfo = newEclipseEnvironmentInfo(embedder.getFrameworkClassLoader());
