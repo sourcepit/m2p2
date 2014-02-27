@@ -105,7 +105,7 @@ public final class MavenRepositories
    {
       try
       {
-         return normalize(new URI(uri));
+         return normalize(new URI(uri.replace('\\', '/')));
       }
       catch (URISyntaxException e)
       {
