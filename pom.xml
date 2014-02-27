@@ -11,6 +11,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<repositories>
+		<repository>
+			<id>srcpit-public</id>
+			<url>http://nexus.sourcepit.org/content/groups/public/</url>
+		</repository>
+	</repositories>
+
 	<modules>
 		<module>m2p2-osgi-embedder</module>
 		<module>m2p2-osgi-embedder-maven</module>
