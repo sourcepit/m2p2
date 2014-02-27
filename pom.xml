@@ -11,6 +11,10 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<scm>
+		<connection>scm:git:git@github.com:sourcepit/m2p2.git</connection>
+	</scm>
+
 	<repositories>
 		<repository>
 			<id>srcpit-public</id>
