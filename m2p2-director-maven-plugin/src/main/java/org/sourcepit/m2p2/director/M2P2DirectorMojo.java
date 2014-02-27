@@ -8,13 +8,32 @@ package org.sourcepit.m2p2.director;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PACKAGE;
+import static org.sourcepit.common.utils.io.IO.buffIn;
+import static org.sourcepit.common.utils.io.IO.buffOut;
+import static org.sourcepit.common.utils.io.IO.fileIn;
+import static org.sourcepit.common.utils.io.IO.fileOut;
+import static org.sourcepit.common.utils.io.IO.read;
+import static org.sourcepit.common.utils.io.IO.write;
 import static org.sourcepit.m2p2.osgi.embedder.BundleContextUtil.getService;
 import static org.sourcepit.m2p2.osgi.embedder.maven.equinox.EclipseEnvironmentInfo.newEclipseEnvironmentInfo;
 import static org.sourcepit.m2p2.osgi.embedder.maven.equinox.SecurePreferencesUtil.getSecurePreferences;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -43,6 +62,12 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
+import org.sourcepit.common.utils.charset.CharsetDetectionResult;
+import org.sourcepit.common.utils.charset.CharsetDetector;
+import org.sourcepit.common.utils.io.IO;
+import org.sourcepit.common.utils.io.Read;
+import org.sourcepit.common.utils.io.Read.FromStream;
+import org.sourcepit.common.utils.io.Write.ToStream;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
 import org.sourcepit.guplex.Guplex;
@@ -115,10 +140,21 @@ public class M2P2DirectorMojo extends AbstractMojo
    @Parameter(defaultValue = "false")
    private boolean roaming;
 
+   @Parameter
+   private File preferenceCustomizationFile;
+
+   @Parameter(defaultValue = "${project.build.sourceEncoding}")
+   private String eclipseIniEncoding;
+
    @Override
    public void execute() throws MojoExecutionException, MojoFailureException
    {
       guplex.inject(this, true);
+
+      if (eclipseIniEncoding.equals("${project.build.sourceEncoding}"))
+      {
+         eclipseIniEncoding = Charset.defaultCharset().name();
+      }
 
       final OSGiEmbedder embedder = createOSGiEmbedder();
       embedder.start();
@@ -144,7 +180,7 @@ public class M2P2DirectorMojo extends AbstractMojo
 
          arguments.add("-profile");
          arguments.add(profile);
-         
+
          if (profileProperties == null)
          {
             profileProperties = new Properties();
@@ -193,7 +229,7 @@ public class M2P2DirectorMojo extends AbstractMojo
             sb.append(' ');
          }
          sb.deleteCharAt(sb.length() - 1);
-         
+
          getLog().info(sb.toString());
 
          // set new env args
@@ -223,6 +259,125 @@ public class M2P2DirectorMojo extends AbstractMojo
       {
          embedder.stop(0);
       }
+
+      if (preferenceCustomizationFile != null)
+      {
+         final File eclipseIniFile = new File(destination, "eclipse.ini");
+
+
+      }
+   }
+
+   private IniFile detectIniFiles(File dir) throws IOException
+   {
+      final File[] iniFiles = dir.listFiles(new FileFilter()
+      {
+         @Override
+         public boolean accept(File file)
+         {
+            return file.isFile() && file.getName().endsWith(".ini");
+         }
+      });
+
+      for (File iniFile : iniFiles)
+      {
+         final IniFile i = new IniFile();
+         i.encoding = eclipseIniEncoding;
+         final String eol = detectLineSeparator(iniFile, i.encoding);
+         i.eol = eol == null ? System.getProperty("line.separator") : eol;
+         i.file = iniFile;
+      }
+   }
+
+   private static class IniFile
+   {
+      private File file;
+      private String encoding;
+      private String eol;
+      private List<String> lines;
+
+      void load() throws IOException
+      {
+         lines = readLines(file, encoding);
+      }
+
+      void save() throws IOException
+      {
+         writeLines(file, encoding, eol, lines);
+      }
+   }
+
+   public static void writeLines(File file, final String encoding, final String eol, List<String> lines)
+      throws IOException
+   {
+      write(new ToStream<List<String>>()
+      {
+         @Override
+         public void write(OutputStream out, List<String> lines) throws Exception
+         {
+            final Writer writer = new OutputStreamWriter(out, encoding);
+            for (String line : lines)
+            {
+               writer.write(line);
+               writer.write(eol);
+            }
+         }
+      }, buffOut(fileOut(file)), lines);
+   }
+
+   public static List<String> readLines(File file, String encoding) throws IOException
+   {
+      return read(new FromStream<List<String>>()
+      {
+         @Override
+         public List<String> read(InputStream in) throws Exception
+         {
+            final BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            final List<String> list = new ArrayList<String>();
+            String line;
+            while ((line = br.readLine()) != null)
+            {
+               // skip whitespace
+               if (line.trim().length() > 0)
+               {
+                  list.add(line);
+               }
+            }
+            return list;
+
+         }
+      }, fileIn(file));
+   }
+
+   private static String detectLineSeparator(File file, final String encoding) throws IOException
+   {
+      return read(new FromStream<String>()
+      {
+         @Override
+         public String read(InputStream in) throws Exception
+         {
+            final Reader reader = new InputStreamReader(in, encoding);
+
+            char current = (char) reader.read();
+            while (current > -1)
+            {
+               if ((current == '\n') || (current == '\r'))
+               {
+                  final StringBuilder sb = new StringBuilder(2);
+                  sb.append(current);
+                  char next = (char) reader.read();
+                  if ((next == '\r') || (next == '\n'))
+                  {
+                     sb.append(next);
+                  }
+                  return sb.toString();
+               }
+               current = (char) reader.read();
+            }
+
+            return null;
+         }
+      }, buffIn(fileIn(file)));
    }
 
    private Collection<URI> applyRepositories(final BundleContext bundleContext)
