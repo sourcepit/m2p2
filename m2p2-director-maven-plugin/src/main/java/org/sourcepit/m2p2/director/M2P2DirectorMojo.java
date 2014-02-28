@@ -144,7 +144,7 @@ public class M2P2DirectorMojo extends AbstractMojo
    {
       guplex.inject(this, true);
 
-      if (defaultEncoding.equals("${project.build.sourceEncoding}"))
+      if (defaultEncoding == null || defaultEncoding.equals("${project.build.sourceEncoding}"))
       {
          defaultEncoding = Charset.defaultCharset().name();
       }
