@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.equinox.internal.p2.repository.AuthenticationFailedException;
 import org.eclipse.equinox.internal.p2.repository.Transport;
 import org.eclipse.equinox.p2.repository.artifact.IArtifactDescriptor;
+import org.osgi.service.log.LogService;
 
 public class FileCacheTransport extends Transport
 {
@@ -35,10 +36,13 @@ public class FileCacheTransport extends Transport
 
    private final Transport target;
 
-   public FileCacheTransport(File cacheDir, Transport target)
+   private final LogService log;
+
+   public FileCacheTransport(File cacheDir, Transport target, LogService log)
    {
       this.cacheDir = cacheDir;
       this.target = target;
+      this.log = log;
    }
 
    public IStatus download(URI toDownload, OutputStream target, long startPos, IProgressMonitor monitor)
@@ -67,11 +71,9 @@ public class FileCacheTransport extends Transport
          try
          {
             fis = new FileInputStream(artifactFile);
-
-            System.out.println("From cache: " + descriptor.getArtifactKey().toExternalForm());
+            log.log(LogService.LOG_INFO, "Downloading " + descriptor.getArtifactKey().toExternalForm() + " (cached)");
             BufferedInputStream buff = new BufferedInputStream(fis);
             copyLarge(buff, target, new byte[DEFAULT_BUFFER_SIZE]);
-
             return org.eclipse.core.runtime.Status.OK_STATUS;
          }
          catch (IOException e)
@@ -126,25 +128,22 @@ public class FileCacheTransport extends Transport
                }
             };
 
+            log.log(LogService.LOG_INFO, "Downloading " + descriptor.getArtifactKey().toExternalForm());
             IStatus result = this.target.download(toDownload, agent, monitor);
 
             buff.flush();
             buff.close();
 
-            byte[] digest = md5Digest.digest();
-            StringBuilder buf = new StringBuilder();
-            for (int i = 0; i < digest.length; i++)
-            {
-               if ((digest[i] & 0xFF) < 0x10)
-                  buf.append('0');
-               buf.append(Integer.toHexString(digest[i] & 0xFF));
-            }
-
-            String actualMd5 = buf.toString();
-            System.out.println(descriptor.getArtifactKey().toExternalForm());
-            System.out.println(md5);
-            System.out.println(actualMd5);
-            System.out.println();
+            // TODO verify checksum
+            // byte[] digest = md5Digest.digest();
+            // StringBuilder buf = new StringBuilder();
+            // for (int i = 0; i < digest.length; i++)
+            // {
+            // if ((digest[i] & 0xFF) < 0x10)
+            // buf.append('0');
+            // buf.append(Integer.toHexString(digest[i] & 0xFF));
+            // }
+            // String actualMd5 = buf.toString();
 
             return result;
          }

@@ -8,11 +8,8 @@ package org.sourcepit.m2p2.director;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PACKAGE;
-import static org.sourcepit.common.utils.io.IO.buffIn;
 import static org.sourcepit.common.utils.io.IO.buffOut;
-import static org.sourcepit.common.utils.io.IO.fileIn;
 import static org.sourcepit.common.utils.io.IO.fileOut;
-import static org.sourcepit.common.utils.io.IO.read;
 import static org.sourcepit.common.utils.io.IO.write;
 import static org.sourcepit.m2p2.director.EclipseIniUtil.applyDefaults;
 import static org.sourcepit.m2p2.director.EclipseIniUtil.parse;
@@ -24,10 +21,8 @@ import static org.sourcepit.m2p2.osgi.embedder.maven.equinox.SecurePreferencesUt
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -59,7 +54,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
-import org.sourcepit.common.utils.io.Read.FromStream;
 import org.sourcepit.common.utils.io.Write.ToStream;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
@@ -305,37 +299,6 @@ public class M2P2DirectorMojo extends AbstractMojo
             }
          }
       }, buffOut(fileOut(file)), lines);
-   }
-
-   private static String detectLineSeparator(File file, final String encoding) throws IOException
-   {
-      return read(new FromStream<String>()
-      {
-         @Override
-         public String read(InputStream in) throws Exception
-         {
-            final Reader reader = new InputStreamReader(in, encoding);
-
-            char current = (char) reader.read();
-            while (current > -1)
-            {
-               if ((current == '\n') || (current == '\r'))
-               {
-                  final StringBuilder sb = new StringBuilder(2);
-                  sb.append(current);
-                  char next = (char) reader.read();
-                  if ((next == '\r') || (next == '\n'))
-                  {
-                     sb.append(next);
-                  }
-                  return sb.toString();
-               }
-               current = (char) reader.read();
-            }
-
-            return null;
-         }
-      }, buffIn(fileIn(file)));
    }
 
    private Collection<URI> applyRepositories(final BundleContext bundleContext)

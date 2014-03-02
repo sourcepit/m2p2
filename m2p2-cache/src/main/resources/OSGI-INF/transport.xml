@@ -6,4 +6,5 @@
    </service>
    <property name="p2.agent.servicename" type="String" value="org.eclipse.equinox.internal.p2.repository.Transport"/>
    <reference bind="setEnvironmentInfo" cardinality="1..1" interface="org.eclipse.osgi.service.environment.EnvironmentInfo" name="EnvironmentInfo" policy="static" unbind="unsetEnvironmentInfo"/>
+   <reference bind="setLog" cardinality="1..1" interface="org.osgi.service.log.LogService" name="LogService" policy="static" unbind="unsetLog"/>
 </scr:component>
