@@ -45,7 +45,7 @@ public class ArtifactResolver
    private ArtifactFactory artifactFactory;
 
 
-   public DependencyResult resolve(MavenSession session, List<ArtifactKey> rootArtifacts)
+   public DependencyResult resolve(MavenSession session, List<ArtifactKey> rootArtifacts, List<String> exclusions)
       throws DependencyResolutionException
    {
       final List<Dependency> bundleArtifacts = new ArrayList<Dependency>(rootArtifacts.size());
@@ -54,11 +54,11 @@ public class ArtifactResolver
          final Artifact artifact = artifactFactory.createArtifact(rootArtifact);
          bundleArtifacts.add(new Dependency(artifact, null));
       }
-      return resolveDependencies(session, bundleArtifacts);
+      return resolveDependencies(session, bundleArtifacts, exclusions);
    }
 
-   private DependencyResult resolveDependencies(MavenSession session, List<Dependency> bundleArtifacts)
-      throws DependencyResolutionException
+   private DependencyResult resolveDependencies(MavenSession session, List<Dependency> bundleArtifacts,
+      List<String> exclusions) throws DependencyResolutionException
    {
       final List<RemoteRepository> repositories = getRemoteRepositories(session);
 
@@ -67,6 +67,11 @@ public class ArtifactResolver
       final List<DependencyFilter> filters = new ArrayList<DependencyFilter>(2);
       filters.add(new ScopeDependencyFilter("provided", "test"));
       filters.add(new ExclusionsDependencyFilter(artifactFilterManager.getCoreArtifactExcludes()));
+
+      if (exclusions != null && !exclusions.isEmpty())
+      {
+         filters.add(new ExclusionsDependencyFilter(exclusions));
+      }
 
       final DependencyRequest dependencyRequest = new DependencyRequest(collectRequest,
          new AndDependencyFilter(filters));

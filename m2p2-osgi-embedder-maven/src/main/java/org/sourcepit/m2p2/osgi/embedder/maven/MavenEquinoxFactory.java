@@ -67,8 +67,10 @@ public class MavenEquinoxFactory
       final List<ArtifactKey> frameworkArtifacts = getArtifacts(configuration, "m2p2.frameworkArtifacts");
       final List<ArtifactKey> bundleArtifacts = getArtifacts(configuration, "m2p2.bundleArtifacts");
 
+      final List<String> exclusions = getExclusions(configuration, "m2p2.bundleArtifactExclusions");
+
       final BundleProvider<DependencyResolutionException> bundleProvider = new MavenBundleProvider(artifactResolver,
-         session, frameworkArtifacts, bundleArtifacts);
+         session, frameworkArtifacts, bundleArtifacts, exclusions);
 
       Map<String, String> frameworkProperties = new HashMap<String, String>();
       final OSGiEmbedder embeddedEquinox = new OSGiEmbedder(frameworkLocationProvider, startLevelProvider,
@@ -93,6 +95,16 @@ public class MavenEquinoxFactory
       });
 
       return embeddedEquinox;
+   }
+
+   private List<String> getExclusions(PropertiesSource configuration, String key)
+   {
+      final List<String> exclusions = new ArrayList<String>();
+      for (String exclusion : configuration.get(key, "").split(","))
+      {
+         exclusions.add(exclusion.trim());
+      }
+      return exclusions;
    }
 
    private List<ArtifactKey> getArtifacts(PropertiesSource config, String key)

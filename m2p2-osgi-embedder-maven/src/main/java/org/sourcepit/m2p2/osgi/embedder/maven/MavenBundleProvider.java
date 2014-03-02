@@ -31,18 +31,21 @@ public class MavenBundleProvider implements BundleProvider<DependencyResolutionE
       private ArtifactResolver artifactResolver;
       private MavenSession session;
       private List<ArtifactKey> artifacts;
+      private List<String> exclusions;
 
-      public JARResolver(ArtifactResolver artifactResolver, MavenSession session, List<ArtifactKey> artifacts)
+      public JARResolver(ArtifactResolver artifactResolver, MavenSession session, List<ArtifactKey> artifacts,
+         List<String> exclusions)
       {
          this.artifactResolver = artifactResolver;
          this.session = session;
          this.artifacts = artifacts;
+         this.exclusions = exclusions;
       }
 
       @Override
       public Iterator2<URL, DependencyResolutionException> iterator() throws DependencyResolutionException
       {
-         final DependencyResult result = artifactResolver.resolve(session, artifacts);
+         final DependencyResult result = artifactResolver.resolve(session, artifacts, exclusions);
          final List<ArtifactResult> artifactResults = result.getArtifactResults();
          final List<URL> bundleURIs = new ArrayList<URL>(artifactResults.size());
          for (ArtifactResult artifactResult : artifactResults)
@@ -78,10 +81,10 @@ public class MavenBundleProvider implements BundleProvider<DependencyResolutionE
    private JARResolver frameworkJARs, bundleJARs;
 
    public MavenBundleProvider(ArtifactResolver artifactResolver, MavenSession session,
-      List<ArtifactKey> frameworkArtifacts, List<ArtifactKey> bundleArtifacts)
+      List<ArtifactKey> frameworkArtifacts, List<ArtifactKey> bundleArtifacts, List<String> exclusions)
    {
-      frameworkJARs = new JARResolver(artifactResolver, session, frameworkArtifacts);
-      bundleJARs = new JARResolver(artifactResolver, session, bundleArtifacts);
+      frameworkJARs = new JARResolver(artifactResolver, session, frameworkArtifacts, exclusions);
+      bundleJARs = new JARResolver(artifactResolver, session, bundleArtifacts, exclusions);
    }
 
    @Override
