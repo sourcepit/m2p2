@@ -31,12 +31,13 @@ public class FileCacheTransport extends Transport
 {
    public static final ThreadLocal<IArtifactDescriptor> CACHE = new ThreadLocal<IArtifactDescriptor>();
 
-   private static final File CACHE_DIR = new File("d:/tmp/m2p2/");
+   private File cacheDir;
 
    private final Transport target;
 
-   public FileCacheTransport(Transport target)
+   public FileCacheTransport(File cacheDir, Transport target)
    {
+      this.cacheDir = cacheDir;
       this.target = target;
    }
 
@@ -59,7 +60,7 @@ public class FileCacheTransport extends Transport
          return this.target.download(toDownload, target, monitor);
       }
 
-      final File artifactFile = new File(CACHE_DIR, md5);
+      final File artifactFile = new File(cacheDir, md5);
       if (artifactFile.exists())
       {
          FileInputStream fis = null;

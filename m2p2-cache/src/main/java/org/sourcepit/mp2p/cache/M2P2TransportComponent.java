@@ -11,14 +11,31 @@
 
 package org.sourcepit.mp2p.cache;
 
+import java.io.File;
+
 import org.eclipse.equinox.internal.p2.transport.ecf.RepositoryTransport;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.core.spi.IAgentServiceFactory;
+import org.eclipse.osgi.service.environment.EnvironmentInfo;
 
 public class M2P2TransportComponent implements IAgentServiceFactory
 {
+   private EnvironmentInfo envInfo;
+
+   public void setEnvironmentInfo(EnvironmentInfo envInfo)
+   {
+      this.envInfo = envInfo;
+   }
+
+   public void unsetEnvironmentInfo(EnvironmentInfo envInfo)
+   {
+      this.envInfo = envInfo;
+   }
+
    public Object createService(IProvisioningAgent agent)
    {
-      return new FileCacheTransport(new RepositoryTransport(agent));
+      final File dataDir = M2P2CacheManagerComponent.getDataDir(envInfo);
+      final File cacheDir = new File(dataDir, "p2-repository-artifacts");
+      return new FileCacheTransport(cacheDir, new RepositoryTransport(agent));
    }
 }

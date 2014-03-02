@@ -11,6 +11,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>srcpit.org.eclipse.osgi</groupId>
+			<artifactId>org.eclipse.osgi</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
 			<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
 			<version>1.1.200-v20130515-2028</version>
@@ -31,7 +36,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Service-Component>OSGI-INF/repositoryManager.xml,OSGI-INF/transport.xml</Service-Component>
+						<Service-Component>OSGI-INF/repositoryManager.xml,OSGI-INF/transport.xml,OSGI-INF/cacheManager.xml</Service-Component>
 					</instructions>
 				</configuration>
 			</plugin>

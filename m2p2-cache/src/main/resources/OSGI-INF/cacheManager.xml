@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.equinox.p2.transport.ecf">
-   <implementation class="org.sourcepit.mp2p.cache.M2P2TransportComponent"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.equinox.p2.repository">
+   <implementation class="org.sourcepit.mp2p.cache.M2P2CacheManagerComponent"/>
    <service>
       <provide interface="org.eclipse.equinox.p2.core.spi.IAgentServiceFactory"/>
    </service>
-   <property name="p2.agent.servicename" type="String" value="org.eclipse.equinox.internal.p2.repository.Transport"/>
+   <property name="p2.agent.servicename" type="String" value="org.eclipse.equinox.internal.p2.repository.CacheManager"/>
    <reference bind="setEnvironmentInfo" cardinality="1..1" interface="org.eclipse.osgi.service.environment.EnvironmentInfo" name="EnvironmentInfo" policy="static" unbind="unsetEnvironmentInfo"/>
 </scr:component>

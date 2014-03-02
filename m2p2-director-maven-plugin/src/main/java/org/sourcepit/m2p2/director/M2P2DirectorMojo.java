@@ -64,6 +64,7 @@ import org.sourcepit.common.utils.io.Write.ToStream;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
 import org.sourcepit.guplex.Guplex;
+import org.sourcepit.m2p2.osgi.embedder.AbstractOSGiEmbedderLifecycleListener;
 import org.sourcepit.m2p2.osgi.embedder.BundleContextUtil;
 import org.sourcepit.m2p2.osgi.embedder.OSGiEmbedder;
 import org.sourcepit.m2p2.osgi.embedder.maven.MavenEquinoxFactory;
@@ -149,8 +150,6 @@ public class M2P2DirectorMojo extends AbstractMojo
          defaultEncoding = Charset.defaultCharset().name();
       }
 
-      // TODO set 'eclipse.p2.data.area' to provide a shared cache for repo metadatas 
-      
       final OSGiEmbedder embedder = createOSGiEmbedder();
       embedder.start();
       try
@@ -271,7 +270,7 @@ public class M2P2DirectorMojo extends AbstractMojo
    private void adoptEclipseIni() throws IOException
    {
       applyDefaults(destination, eclipseIni, defaultEncoding);
-      
+
       final List<String> appArgs = new ArrayList<String>();
       final List<String> vmArgs = new ArrayList<String>();
       parse(destination, eclipseIni, appArgs, vmArgs);
@@ -286,7 +285,7 @@ public class M2P2DirectorMojo extends AbstractMojo
       {
          vmArgMods.apply(vmArgs);
       }
-      
+
       save(destination, eclipseIni, appArgs, vmArgs);
    }
 
@@ -397,6 +396,22 @@ public class M2P2DirectorMojo extends AbstractMojo
       {
          throw new MojoExecutionException("Failed to create OSGi embedder.", e);
       }
+
+      embedder.addLifecycleListener(new AbstractOSGiEmbedderLifecycleListener()
+      {
+         @Override
+         public void frameworkPropertiesInitialized(OSGiEmbedder embeddedEquinox,
+            Map<String, String> frameworkProperties)
+         {
+            final String localRepoDir = buildContext.getSession().getLocalRepository().getBasedir();
+
+            final File dataArea = new File(localRepoDir, ".cache/m2p2");
+            dataArea.mkdirs();
+            
+            frameworkProperties.put("m2p2.data.area", dataArea.getAbsolutePath());
+            super.frameworkPropertiesInitialized(embeddedEquinox, frameworkProperties);
+         }
+      });
 
       embedder.addLifecycleListener(new EquinoxEnvironmentConfigurer());
       embedder.addLifecycleListener(new EquinoxProxyConfigurer(buildContext, settingsDecrypter));
