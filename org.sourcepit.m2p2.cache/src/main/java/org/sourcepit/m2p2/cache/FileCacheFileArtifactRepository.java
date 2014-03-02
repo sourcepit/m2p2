@@ -4,7 +4,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.sourcepit.mp2p.cache;
+package org.sourcepit.m2p2.cache;
 
 import java.io.File;
 

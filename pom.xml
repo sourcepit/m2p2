@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sourcepit</groupId>
@@ -12,8 +13,8 @@
 
 	<scm>
 		<connection>scm:git:git@github.com:sourcepit/m2p2.git</connection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<repositories>
 		<repository>
@@ -26,7 +27,8 @@
 		<module>m2p2-osgi-embedder</module>
 		<module>m2p2-osgi-embedder-maven</module>
 		<module>m2p2-director-maven-plugin</module>
-		<module>m2p2-cache</module>
+		<module>org.sourcepit.m2p2.cache</module>
+		<module>org.sourcepit.m2p2.director.app</module>
 	</modules>
 
 	<dependencyManagement>
@@ -79,6 +81,14 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.4.0</version>
+				<extensions>true</extensions>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>

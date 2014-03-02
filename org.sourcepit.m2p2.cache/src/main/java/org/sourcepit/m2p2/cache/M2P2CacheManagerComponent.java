@@ -9,7 +9,7 @@
  * Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.sourcepit.mp2p.cache;
+package org.sourcepit.m2p2.cache;
 
 import java.io.File;
 

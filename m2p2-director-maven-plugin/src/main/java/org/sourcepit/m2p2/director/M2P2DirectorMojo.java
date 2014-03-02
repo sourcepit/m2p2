@@ -152,7 +152,7 @@ public class M2P2DirectorMojo extends AbstractMojo
 
          final List<String> arguments = new ArrayList<String>();
          arguments.add("-application");
-         arguments.add("org.eclipse.equinox.p2.director");
+         arguments.add("org.sourcepit.mp2p.director");
 
          arguments.add("-repository");
          arguments.add(toArgument(applyRepositories(bundleContext)));
