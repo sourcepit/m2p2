@@ -370,8 +370,9 @@ public class M2P2DirectorMojo extends AbstractMojo
 
             final File dataArea = new File(localRepoDir, ".cache/m2p2");
             dataArea.mkdirs();
-            
+
             frameworkProperties.put("m2p2.data.area", dataArea.getAbsolutePath());
+            frameworkProperties.put("org.ops4j.pax.logging.DefaultServiceLog.level", "WARN");
             super.frameworkPropertiesInitialized(embeddedEquinox, frameworkProperties);
          }
       });
