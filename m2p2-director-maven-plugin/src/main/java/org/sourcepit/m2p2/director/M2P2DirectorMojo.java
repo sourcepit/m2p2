@@ -149,6 +149,8 @@ public class M2P2DirectorMojo extends AbstractMojo
          defaultEncoding = Charset.defaultCharset().name();
       }
 
+      // TODO set 'eclipse.p2.data.area' to provide a shared cache for repo metadatas 
+      
       final OSGiEmbedder embedder = createOSGiEmbedder();
       embedder.start();
       try

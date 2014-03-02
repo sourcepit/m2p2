@@ -26,6 +26,7 @@
 		<module>m2p2-osgi-embedder</module>
 		<module>m2p2-osgi-embedder-maven</module>
 		<module>m2p2-director-maven-plugin</module>
+		<module>m2p2-cache</module>
 	</modules>
 
 	<dependencyManagement>

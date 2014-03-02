@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.sourcepit.m2p2</groupId>
+		<artifactId>m2p2</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>m2p2-cache</artifactId>
+	<packaging>bundle</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
+			<version>1.1.200-v20130515-2028</version>
+		</dependency>
+		<dependency>
+			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<artifactId>org.eclipse.equinox.p2.transport.ecf</artifactId>
+			<version>1.1.0-v20130516-1858</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.4.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Service-Component>OSGI-INF/repositoryManager.xml,OSGI-INF/transport.xml</Service-Component>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
