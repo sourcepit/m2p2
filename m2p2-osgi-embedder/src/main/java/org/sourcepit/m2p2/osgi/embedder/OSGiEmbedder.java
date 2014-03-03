@@ -34,11 +34,15 @@ import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sourcepit.common.utils.io.Read.FromStream;
 import org.sourcepit.common.utils.lang.ThrowablePipe;
 
 public class OSGiEmbedder
 {
+   private static final Logger LOG = LoggerFactory.getLogger(OSGiEmbedder.class);
+
    private final FrameworkLocationProvider frameworkLocationProvider;
    private final StartLevelProvider startLevelProvider;
    private final BundleStartPolicyProvider bundleStartPolicyProvider;
@@ -97,7 +101,7 @@ public class OSGiEmbedder
       frameworkProerties.put("osgi.configuration.area", new File(frameworkLocation, "configuration").getAbsolutePath());
 
       classLoadingStrategy.adoptFrameworkProperties(frameworkProerties);
-      
+
       for (OSGiEmbedderLifecycleListener lifecycleListener : lifecycleListeners)
       {
          lifecycleListener.frameworkPropertiesInitialized(this, frameworkProerties);
@@ -111,7 +115,7 @@ public class OSGiEmbedder
       {
          throw pipe(e);
       }
-      
+
       for (OSGiEmbedderLifecycleListener lifecycleListener : lifecycleListeners)
       {
          lifecycleListener.frameworkClassLoaderCreated(this, frameworkClassLoader);
@@ -175,7 +179,7 @@ public class OSGiEmbedder
 
       for (Bundle bundle : bundleContext.getBundles())
       {
-         System.out.println(bundle.getSymbolicName() + ": " + bundle.getState());
+         LOG.debug("{} {}", bundle.getSymbolicName(), bundle.getState());
       }
 
       for (OSGiEmbedderLifecycleListener lifecycleListener : lifecycleListeners)
@@ -288,12 +292,12 @@ public class OSGiEmbedder
 
       errors.throwPipe();
    }
-   
+
    public File getFrameworkLocation()
    {
       return frameworkLocation;
    }
-   
+
    public ClassLoader getFrameworkClassLoader()
    {
       return frameworkClassLoader;
