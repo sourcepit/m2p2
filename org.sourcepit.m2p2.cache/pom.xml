@@ -25,6 +25,10 @@
 			<artifactId>org.eclipse.equinox.p2.transport.ecf</artifactId>
 			<version>1.1.0-v20130516-1858</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

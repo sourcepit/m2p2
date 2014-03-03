@@ -6,6 +6,11 @@
 
 package org.sourcepit.m2p2.cache;
 
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.apache.commons.io.FileUtils.forceMkdir;
+import static org.apache.commons.io.FileUtils.moveFile;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -17,9 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -67,26 +74,152 @@ public class FileCacheTransport extends Transport
       final File artifactFile = new File(cacheDir, md5);
       if (artifactFile.exists())
       {
-         FileInputStream fis = null;
+         return fromCache(target, descriptor, artifactFile);
+      }
+      else
+      {
+         return cache(toDownload, target, monitor, descriptor, artifactFile, md5);
+      }
+   }
+
+   private IStatus cache(URI toDownload, OutputStream target, IProgressMonitor monitor,
+      final IArtifactDescriptor descriptor, File artifactFile, String md5)
+   {
+      log.log(LogService.LOG_INFO, "Downloading " + descriptor.getArtifactKey().toExternalForm());
+
+      final MessageDigest md5Digest = newMd5Digest();
+
+      final File tmpFile;
+      try
+      {
+         tmpFile = createTempFile(artifactFile);
+      }
+      catch (IOException e)
+      {
+         throw new IllegalStateException(e);
+      }
+
+      final IStatus result;
+
+      DigestOutputStream out = null;
+      try
+      {
+         out = new DigestOutputStream(new CopyOutputStream(target, new BufferedOutputStream(new FileOutputStream(
+            tmpFile))), md5Digest);
+         result = this.target.download(toDownload, out, monitor);
+         out.flush();
+      }
+      catch (IOException e)
+      {
+         deleteQuietly(tmpFile);
+         throw new IllegalStateException(e);
+      }
+      finally
+      {
+         IOUtils.closeQuietly(out);
+      }
+
+      final String actualMd5 = toHexString(out.getMessageDigest().digest());
+      if (!md5.equals(actualMd5))
+      {
+         log.log(LogService.LOG_WARNING, "Unable to cache artifact " + descriptor.getArtifactKey().toExternalForm()
+            + " due to checksum verification failure. Expected " + md5 + " but was " + actualMd5 + ".");
+         deleteQuietly(tmpFile);
+      }
+      else
+      {
          try
          {
-            fis = new FileInputStream(artifactFile);
-            log.log(LogService.LOG_INFO, "Downloading " + descriptor.getArtifactKey().toExternalForm() + " (cached)");
-            BufferedInputStream buff = new BufferedInputStream(fis);
-            copyLarge(buff, target, new byte[DEFAULT_BUFFER_SIZE]);
-            return org.eclipse.core.runtime.Status.OK_STATUS;
+            deleteFile(artifactFile);
+            moveFile(tmpFile, artifactFile);
          }
          catch (IOException e)
          {
             throw new IllegalStateException(e);
          }
+      }
+
+      return result;
+   }
+
+   private File createTempFile(File file) throws IOException
+   {
+      final File dir = file.getParentFile();
+      forceMkdir(dir);
+      return File.createTempFile(file.getName() + "_", ".tmp", dir);
+   }
+
+   private void deleteFile(File file) throws IOException
+   {
+      try
+      {
+         forceDelete(file);
+      }
+      catch (FileNotFoundException e)
+      {
+      }
+   }
+
+   private static String toHexString(byte[] digest)
+   {
+      StringBuilder buf = new StringBuilder();
+      for (int i = 0; i < digest.length; i++)
+      {
+         if ((digest[i] & 0xFF) < 0x10)
+            buf.append('0');
+         buf.append(Integer.toHexString(digest[i] & 0xFF));
+      }
+      return buf.toString();
+   }
+
+   private static MessageDigest newMd5Digest()
+   {
+      final MessageDigest md5Digest;
+      try
+      {
+         md5Digest = MessageDigest.getInstance("MD5");
+      }
+      catch (NoSuchAlgorithmException e)
+      {
+         throw new IllegalStateException(e);
+      }
+      return md5Digest;
+   }
+
+   private static final class CopyOutputStream extends FilterOutputStream
+   {
+      private OutputStream[] outs;
+
+      public CopyOutputStream(OutputStream out, OutputStream... outs)
+      {
+         super(out);
+         this.outs = outs == null ? new OutputStream[0] : outs;
+      }
+
+      @Override
+      public void write(int b) throws IOException
+      {
+         super.write(b);
+         for (OutputStream out : outs)
+         {
+            out.write(b);
+         }
+      }
+
+      @Override
+      public void flush() throws IOException
+      {
+         try
+         {
+            super.flush();
+         }
          finally
          {
-            if (fis != null)
+            for (OutputStream out : outs)
             {
                try
                {
-                  fis.close();
+                  out.flush();
                }
                catch (IOException e)
                {
@@ -94,70 +227,21 @@ public class FileCacheTransport extends Transport
             }
          }
       }
-      else
+
+      @Override
+      public void close() throws IOException
       {
-         FileOutputStream fos = null;
          try
          {
-            artifactFile.getParentFile().mkdirs();
-            artifactFile.createNewFile();
-
-            fos = new FileOutputStream(artifactFile);
-
-            final MessageDigest md5Digest;
-            try
-            {
-               md5Digest = MessageDigest.getInstance("MD5");
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-               throw new IllegalStateException(e);
-            } //$NON-NLS-1$
-
-
-            final BufferedOutputStream buff = new BufferedOutputStream(fos);
-
-            FilterOutputStream agent = new FilterOutputStream(target)
-            {
-               @Override
-               public void write(int b) throws IOException
-               {
-                  buff.write(b);
-                  md5Digest.update((byte) b);
-                  super.write(b);
-               }
-            };
-
-            log.log(LogService.LOG_INFO, "Downloading " + descriptor.getArtifactKey().toExternalForm());
-            IStatus result = this.target.download(toDownload, agent, monitor);
-
-            buff.flush();
-            buff.close();
-
-            // TODO verify checksum
-            // byte[] digest = md5Digest.digest();
-            // StringBuilder buf = new StringBuilder();
-            // for (int i = 0; i < digest.length; i++)
-            // {
-            // if ((digest[i] & 0xFF) < 0x10)
-            // buf.append('0');
-            // buf.append(Integer.toHexString(digest[i] & 0xFF));
-            // }
-            // String actualMd5 = buf.toString();
-
-            return result;
-         }
-         catch (IOException e)
-         {
-            throw new IllegalStateException(e);
+            super.close();
          }
          finally
          {
-            if (fos != null)
+            for (OutputStream out : outs)
             {
                try
                {
-                  fos.close();
+                  out.close();
                }
                catch (IOException e)
                {
@@ -167,19 +251,24 @@ public class FileCacheTransport extends Transport
       }
    }
 
-   private static final int EOF = -1;
-   private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-
-   public static long copyLarge(InputStream input, OutputStream output, byte[] buffer) throws IOException
+   private IStatus fromCache(OutputStream target, final IArtifactDescriptor descriptor, final File artifactFile)
    {
-      long count = 0;
-      int n = 0;
-      while (EOF != (n = input.read(buffer)))
+      InputStream in = null;
+      try
       {
-         output.write(buffer, 0, n);
-         count += n;
+         in = new FileInputStream(artifactFile);
+         log.log(LogService.LOG_INFO, "Downloading " + descriptor.getArtifactKey().toExternalForm() + " (cached)");
+         IOUtils.copyLarge(new BufferedInputStream(in), target);
+         return org.eclipse.core.runtime.Status.OK_STATUS;
       }
-      return count;
+      catch (IOException e)
+      {
+         throw new IllegalStateException(e);
+      }
+      finally
+      {
+         IOUtils.closeQuietly(in);
+      }
    }
 
    public InputStream stream(URI toDownload, IProgressMonitor monitor) throws FileNotFoundException, CoreException,
