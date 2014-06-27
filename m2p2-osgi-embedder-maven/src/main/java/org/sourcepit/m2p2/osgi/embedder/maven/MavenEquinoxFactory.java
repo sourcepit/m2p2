@@ -28,7 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogReaderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.sourcepit.common.maven.model.ArtifactKey;
 import org.sourcepit.common.utils.props.PropertiesSource;
 import org.sourcepit.m2p2.osgi.embedder.AbstractOSGiEmbedderLifecycleListener;

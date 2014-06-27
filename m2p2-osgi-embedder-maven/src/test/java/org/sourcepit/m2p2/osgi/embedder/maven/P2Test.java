@@ -142,13 +142,13 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
       equinox.start();
 
       BundleContext bundleContext = equinox.getBundleContext();
-      getContainer().addComponent(bundleContext, BundleContext.class, "equinox");
+      container.addComponent(bundleContext, BundleContext.class, "equinox");
 
       ServiceReference<IProvisioningAgent> serviceReference = bundleContext
          .getServiceReference(IProvisioningAgent.class);
       IProvisioningAgent provisioningAgent = bundleContext.getService(serviceReference);
 
-      getContainer().addComponent(provisioningAgent, IProvisioningAgent.class, null);
+      container.addComponent(provisioningAgent, IProvisioningAgent.class, null);
    }
 
    private PropertiesMap readConfig()
@@ -184,7 +184,7 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
    @Test
    public void testFoo() throws Exception
    {
-      IProvisioningAgent provisioningAgent = lookup(IProvisioningAgent.class);
+      IProvisioningAgent provisioningAgent = container.lookup(IProvisioningAgent.class);
 
       IMetadataRepositoryManager metadataRepositoryManager = (IMetadataRepositoryManager) provisioningAgent
          .getService(IMetadataRepositoryManager.SERVICE_NAME);

@@ -15,10 +15,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.resolution.DependencyResolutionException;
-import org.sonatype.aether.resolution.DependencyResult;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.sourcepit.common.maven.model.ArtifactKey;
 import org.sourcepit.common.utils.collections.Iterable2;
 import org.sourcepit.common.utils.collections.Iterator2;

@@ -17,12 +17,10 @@
 		<dependency>
 			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
 			<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
-			<version>1.1.200-v20130515-2028</version>
 		</dependency>
 		<dependency>
 			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
 			<artifactId>org.eclipse.equinox.p2.transport.ecf</artifactId>
-			<version>1.1.0-v20130516-1858</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

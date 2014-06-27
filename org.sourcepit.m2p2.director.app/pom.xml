@@ -17,7 +17,6 @@
 		<dependency>
 			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
 			<artifactId>org.eclipse.equinox.p2.director.app</artifactId>
-			<version>1.0.300-v20130819-1621</version>
 		</dependency>
 	</dependencies>
 

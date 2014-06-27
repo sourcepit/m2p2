@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sourcepit</groupId>
 		<artifactId>srcpit-parent</artifactId>
-		<version>10</version>
+		<version>15</version>
 	</parent>
 	<groupId>org.sourcepit.m2p2</groupId>
 	<artifactId>m2p2</artifactId>
@@ -33,6 +34,26 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.sourcepit.common</groupId>
+				<artifactId>org.sourcepit.common.utils</artifactId>
+				<version>0.13.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sourcepit.common.maven</groupId>
+				<artifactId>common-maven-core</artifactId>
+				<version>0.20.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sourcepit.common.maven</groupId>
+				<artifactId>org.sourcepit.common.maven.artifact</artifactId>
+				<version>0.20.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sourcepit.common</groupId>
+				<artifactId>common-testing</artifactId>
+				<version>0.11.0</version>
+			</dependency>
+			<dependency>
 				<groupId>org.sourcepit.m2p2</groupId>
 				<artifactId>m2p2-osgi-embedder</artifactId>
 				<version>${project.version}</version>
@@ -46,6 +67,56 @@
 				<groupId>srcpit.org.eclipse.osgi</groupId>
 				<artifactId>org.eclipse.osgi</artifactId>
 				<version>3.9.1-v20130814-1242</version>
+			</dependency>
+			<dependency>
+				<groupId>srcpit.org.eclipse.core</groupId>
+				<artifactId>org.eclipse.core.net</artifactId>
+				<version>1.2.200-v20130430-1352</version>
+			</dependency>
+			<dependency>
+				<groupId>srcpit.org.eclipse.equinox</groupId>
+				<artifactId>org.eclipse.equinox.security</artifactId>
+				<version>1.2.0-v20130424-1801</version>
+			</dependency>
+			<dependency>
+				<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+				<artifactId>org.eclipse.equinox.p2.metadata.repository</artifactId>
+				<version>1.2.100-v20130327-2119</version>
+			</dependency>
+			<dependency>
+				<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+				<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
+				<version>1.1.200-v20130515-2028</version>
+			</dependency>
+			<dependency>
+				<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+				<artifactId>org.eclipse.equinox.p2.director</artifactId>
+				<version>2.3.0-v20130526-0335</version>
+			</dependency>
+			<dependency>
+				<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+				<artifactId>org.eclipse.equinox.p2.director.app</artifactId>
+				<version>1.0.300-v20130819-1621</version>
+			</dependency>
+			<dependency>
+				<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+				<artifactId>org.eclipse.equinox.p2.transport.ecf</artifactId>
+				<version>1.1.0-v20130516-1858</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.plexus</groupId>
+				<artifactId>plexus-sec-dispatcher</artifactId>
+				<version>1.3</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-file</artifactId>
+				<version>2.6</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-http</artifactId>
+				<version>2.6</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

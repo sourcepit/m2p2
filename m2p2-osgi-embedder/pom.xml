@@ -27,8 +27,7 @@
 
 		<dependency>
 			<groupId>org.sourcepit.common</groupId>
-			<artifactId>common-utils</artifactId>
-			<version>0.1.0-alpha-9</version>
+			<artifactId>org.sourcepit.common.utils</artifactId>
 		</dependency>
 
 		<dependency>

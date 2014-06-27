@@ -42,7 +42,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.settings.Server;
@@ -57,7 +56,6 @@ import org.osgi.service.log.LogService;
 import org.sourcepit.common.utils.io.Write.ToStream;
 import org.sourcepit.common.utils.props.LinkedPropertiesMap;
 import org.sourcepit.common.utils.props.PropertiesMap;
-import org.sourcepit.guplex.Guplex;
 import org.sourcepit.m2p2.osgi.embedder.AbstractOSGiEmbedderLifecycleListener;
 import org.sourcepit.m2p2.osgi.embedder.BundleContextUtil;
 import org.sourcepit.m2p2.osgi.embedder.OSGiEmbedder;
@@ -70,9 +68,6 @@ import org.sourcepit.m2p2.osgi.embedder.maven.equinox.MavenRepositories;
 @Mojo(name = "install", defaultPhase = PACKAGE, requiresProject = false)
 public class M2P2DirectorMojo extends AbstractMojo
 {
-   @Component
-   private Guplex guplex;
-
    @Inject
    private LegacySupport buildContext;
 
@@ -137,8 +132,6 @@ public class M2P2DirectorMojo extends AbstractMojo
    @Override
    public void execute() throws MojoExecutionException, MojoFailureException
    {
-      guplex.inject(this, true);
-
       if (defaultEncoding == null || defaultEncoding.equals("${project.build.sourceEncoding}"))
       {
          defaultEncoding = Charset.defaultCharset().name();
