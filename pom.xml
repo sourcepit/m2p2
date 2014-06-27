@@ -34,6 +34,16 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.sourcepit.m2p2</groupId>
+				<artifactId>org.sourcepit.m2p2.cache</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sourcepit.m2p2</groupId>
+				<artifactId>org.sourcepit.m2p2.director.app</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.sourcepit.common</groupId>
 				<artifactId>org.sourcepit.common.utils</artifactId>
 				<version>0.13.0</version>
@@ -136,29 +146,59 @@
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
 										<artifactId>maven-plugin-plugin</artifactId>
-										<versionRange>[3.2,)</versionRange>
+										<versionRange>[0,)</versionRange>
 										<goals>
 											<goal>descriptor</goal>
+											<goal>helpmojo</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
 										<ignore />
 									</action>
 								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.sourcepit.osgifier</groupId>
+										<artifactId>osgifier-maven-plugin</artifactId>
+										<versionRange>[0,)</versionRange>
+										<goals>
+											<goal>generate-manifest</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.sourcepit.osgifier</groupId>
+					<artifactId>osgifier-maven-plugin</artifactId>
+					<version>0.19.0</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>generate-manifest</goal>
+								<goal>inject-manifest</goal>
+							</goals>
+							<configuration>
+								<pde>true</pde>
+								<options>
+									<requireBundle>
+										${osgifier.requireBundle},
+										org.eclipse.equinox.p2.**,
+										org.eclipse.equinox.common,
+										org.eclipse.equinox.app
+									</requireBundle>
+								</options>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.4.0</version>
-				<extensions>true</extensions>
-			</plugin>
-		</plugins>
 	</build>
 
 </project>

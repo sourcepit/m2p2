@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sourcepit.m2p2</groupId>
@@ -6,7 +7,6 @@
 		<version>0.4.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>org.sourcepit.m2p2.cache</artifactId>
-	<packaging>bundle</packaging>
 
 	<dependencies>
 		<dependency>
@@ -29,19 +29,31 @@
 	</dependencies>
 
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.felix</groupId>
-					<artifactId>maven-bundle-plugin</artifactId>
-					<configuration>
-						<instructions>
-							<Service-Component>OSGI-INF/repositoryManager.xml,OSGI-INF/transport.xml,OSGI-INF/cacheManager.xml</Service-Component>
-						</instructions>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.sourcepit.osgifier</groupId>
+				<artifactId>osgifier-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-manifest</goal>
+							<goal>inject-manifest</goal>
+						</goals>
+						<configuration>
+							<pde>true</pde>
+							<headerModifications>
+								<headers>
+									<header>
+										<name>Service-Component</name>
+										<value>OSGI-INF/repositoryManager.xml,OSGI-INF/transport.xml,OSGI-INF/cacheManager.xml</value>
+									</header>
+								</headers>
+							</headerModifications>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>
