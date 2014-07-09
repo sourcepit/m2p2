@@ -9,7 +9,10 @@ package org.sourcepit.m2p2.osgi.embedder.maven.equinox;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.eclipse.osgi.internal.framework.EquinoxConfiguration;
 import org.eclipse.osgi.service.environment.EnvironmentInfo;
+import org.osgi.framework.BundleContext;
+import org.sourcepit.m2p2.osgi.embedder.BundleContextUtil;
 
 public class EclipseEnvironmentInfo implements EnvironmentInfo
 {
@@ -26,13 +29,26 @@ public class EclipseEnvironmentInfo implements EnvironmentInfo
       this.setFrameworkArgs = setFrameworkArgs;
    }
 
-   public static EclipseEnvironmentInfo newEclipseEnvironmentInfo(ClassLoader frameworkClassLoader)
+   public static EclipseEnvironmentInfo newEclipseEnvironmentInfo(BundleContext bundleContext)
    {
-      final Class<?> clazz = loadEclipseEnvironmentInfo(frameworkClassLoader);
-      final EnvironmentInfo envInfo = (EnvironmentInfo) invoke(getMethod(clazz, "getDefault"), null);
+      final EnvironmentInfo envInfo = BundleContextUtil.getService(bundleContext, EnvironmentInfo.class);
+
+      final Class<?> clazz = envInfo.getClass();
+
+      if (!EquinoxConfiguration.class.getName().equals(clazz.getName()))
+      {
+         throw new IllegalStateException("Unexpected impl for EnvironmentInfo.");
+      }
+      
+      if (EquinoxConfiguration.class == clazz)
+      {
+         throw new IllegalStateException("Class EquinoxConfiguration leaked into container.");
+      }
+
       final Method setAllArgs = getMethod(clazz, "setAllArgs", String[].class);
       final Method setAppArgs = getMethod(clazz, "setAppArgs", String[].class);
       final Method setFrameworkArgs = getMethod(clazz, "setFrameworkArgs", String[].class);
+      
       return new EclipseEnvironmentInfo(envInfo, setAllArgs, setAppArgs, setFrameworkArgs);
    }
 
@@ -61,33 +77,6 @@ public class EclipseEnvironmentInfo implements EnvironmentInfo
       }
    }
 
-   private static Class<?> loadEclipseEnvironmentInfo(ClassLoader frameworkClassLoader)
-   {
-      final Class<?> clazz;
-      try
-      {
-         clazz = frameworkClassLoader.loadClass(org.eclipse.core.runtime.internal.adaptor.EclipseEnvironmentInfo.class
-            .getName());
-      }
-      catch (ClassNotFoundException e)
-      {
-         throw new IllegalStateException(e);
-      }
-      try
-      {
-         final Class<?> badClazz = EclipseEnvironmentInfo.class.getClassLoader().loadClass(
-            org.eclipse.core.runtime.internal.adaptor.EclipseEnvironmentInfo.class.getName());
-         if (badClazz == clazz)
-         {
-            throw new IllegalStateException();
-         }
-      }
-      catch (ClassNotFoundException e)
-      {
-      }
-      return clazz;
-   }
-
    private static Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes)
    {
       try
@@ -102,17 +91,17 @@ public class EclipseEnvironmentInfo implements EnvironmentInfo
 
    public void setAllArgs(String[] allArgs)
    {
-      invoke(this.setAllArgs, null, (Object) allArgs);
+      invoke(this.setAllArgs, envInfo, (Object) allArgs);
    }
 
    public void setAppArgs(String[] appArgs)
    {
-      invoke(this.setAppArgs, null, (Object) appArgs);
+      invoke(this.setAppArgs, envInfo, (Object) appArgs);
    }
 
    public void setFrameworkArgs(String[] frameworkArgs)
    {
-      invoke(this.setFrameworkArgs, null, (Object) frameworkArgs);
+      invoke(this.setFrameworkArgs, envInfo, (Object) frameworkArgs);
    }
 
    public String[] getCommandLineArgs()

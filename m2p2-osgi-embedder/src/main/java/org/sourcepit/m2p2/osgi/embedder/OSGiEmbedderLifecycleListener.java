@@ -12,7 +12,7 @@ public interface OSGiEmbedderLifecycleListener
 {
    void frameworkPropertiesInitialized(OSGiEmbedder embeddedEquinox, Map<String, String> frameworkProperties);
 
-   void frameworkClassLoaderCreated(OSGiEmbedder embeddedEquinox, ClassLoader frameworkClassLoader);
+   void frameworkInitialized(OSGiEmbedder embeddedEquinox);
 
    void frameworkStarted(OSGiEmbedder embeddedEquinox);
 

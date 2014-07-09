@@ -48,6 +48,7 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.osgi.framework.log.FrameworkLog;
 import org.eclipse.osgi.service.runnable.ApplicationLauncher;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -214,7 +215,7 @@ public class M2P2DirectorMojo extends AbstractMojo
          getLog().info(sb.toString());
 
          // set new env args
-         final EclipseEnvironmentInfo envInfo = newEclipseEnvironmentInfo(embedder.getFrameworkClassLoader());
+         final EclipseEnvironmentInfo envInfo = newEclipseEnvironmentInfo(bundleContext);
          final String[] args = arguments.toArray(new String[arguments.size()]);
          envInfo.setAllArgs(args);
          envInfo.setAppArgs(args);
@@ -225,7 +226,8 @@ public class M2P2DirectorMojo extends AbstractMojo
          equinoxApp.stop();
          equinoxApp.start();
 
-         final EclipseAppLauncher appLauncher = new EclipseAppLauncher(bundleContext, false, true, null);
+         final FrameworkLog log = BundleContextUtil.getService(bundleContext, FrameworkLog.class);
+         final EclipseAppLauncher appLauncher = new EclipseAppLauncher(bundleContext, false, true, log, null);
          final ServiceRegistration<?> registration = bundleContext.registerService(ApplicationLauncher.class.getName(),
             appLauncher, null);
          appLauncher.start(null);
@@ -363,7 +365,7 @@ public class M2P2DirectorMojo extends AbstractMojo
 
             final File dataArea = new File(localRepoDir, ".cache/m2p2");
             dataArea.mkdirs();
-            
+
             frameworkProperties.put("m2p2.data.area", dataArea.getAbsolutePath());
             super.frameworkPropertiesInitialized(embeddedEquinox, frameworkProperties);
          }

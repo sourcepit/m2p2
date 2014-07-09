@@ -116,14 +116,24 @@ public class OSGiEmbedder
          throw pipe(e);
       }
 
-      for (OSGiEmbedderLifecycleListener lifecycleListener : lifecycleListeners)
-      {
-         lifecycleListener.frameworkClassLoaderCreated(this, frameworkClassLoader);
-      }
 
       final FrameworkFactory frameworkFactory = newFrameworkFactory(frameworkClassLoader);
 
       framework = frameworkFactory.newFramework(frameworkProerties);
+      try
+      {
+         framework.init();
+      }
+      catch (BundleException e)
+      {
+         throw pipe(e);
+      }
+      
+      for (OSGiEmbedderLifecycleListener lifecycleListener : lifecycleListeners)
+      {
+         lifecycleListener.frameworkInitialized(this);
+      }
+      
       try
       {
          framework.start();

@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher;
 import org.eclipse.osgi.service.runnable.ApplicationLauncher;
@@ -50,7 +49,7 @@ public class EclipseApplicationEmbedder
    {
       checkState(embedder != null);
       final BundleContext bundleContext = embedder.getBundleContext();
-      final EclipseAppLauncher appLauncher = new EclipseAppLauncher(bundleContext, false, true, null);
+      final EclipseAppLauncher appLauncher = new EclipseAppLauncher(bundleContext, false, true, null, null);
       final ServiceRegistration<?> registration = bundleContext.registerService(ApplicationLauncher.class.getName(),
          appLauncher, null);
       try

@@ -7,21 +7,20 @@
 package org.sourcepit.m2p2.osgi.embedder.maven.equinox;
 
 import static org.sourcepit.common.utils.lang.Exceptions.pipe;
+import static org.sourcepit.m2p2.osgi.embedder.maven.equinox.EclipseEnvironmentInfo.newEclipseEnvironmentInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-import org.eclipse.core.runtime.internal.adaptor.EclipseEnvironmentInfo;
 import org.sourcepit.m2p2.osgi.embedder.AbstractOSGiEmbedderLifecycleListener;
 import org.sourcepit.m2p2.osgi.embedder.OSGiEmbedder;
 
 public class EquinoxEnvironmentConfigurer extends AbstractOSGiEmbedderLifecycleListener
 {
    @Override
-   public void frameworkClassLoaderCreated(OSGiEmbedder embeddedEquinox, ClassLoader frameworkClassLoader)
+   public void frameworkInitialized(OSGiEmbedder embeddedEquinox)
    {
       final Collection<String> nonFrameworkArgs = new LinkedHashSet<String>();
       nonFrameworkArgs.add("-eclipse.keyring");
@@ -36,38 +35,8 @@ public class EquinoxEnvironmentConfigurer extends AbstractOSGiEmbedderLifecycleL
       }
       secureStorage.deleteOnExit();
       nonFrameworkArgs.add(secureStorage.getAbsolutePath());
-      
-      setNonFrameworkArgs(frameworkClassLoader, nonFrameworkArgs);
-   }
 
-   private static void setNonFrameworkArgs(ClassLoader frameworkClassLoader, final Collection<String> nonFrameworkArgs)
-   {
-      Class<?> clazz;
-      try
-      {
-         clazz = frameworkClassLoader.loadClass(EclipseEnvironmentInfo.class.getName());
-      }
-      catch (ClassNotFoundException e)
-      {
-         throw pipe(e);
-      }
-
-      final Object appArgs = nonFrameworkArgs.toArray(new String[nonFrameworkArgs.size()]);
-      try
-      {
-         clazz.getMethod("setAppArgs", String[].class).invoke(null, appArgs);
-      }
-      catch (IllegalAccessException e)
-      {
-         throw pipe(e);
-      }
-      catch (InvocationTargetException e)
-      {
-         throw pipe(e);
-      }
-      catch (NoSuchMethodException e)
-      {
-         throw pipe(e);
-      }
+      EclipseEnvironmentInfo envInfo = newEclipseEnvironmentInfo(embeddedEquinox.getBundleContext());
+      envInfo.setAppArgs(nonFrameworkArgs.toArray(new String[nonFrameworkArgs.size()]));
    }
 }

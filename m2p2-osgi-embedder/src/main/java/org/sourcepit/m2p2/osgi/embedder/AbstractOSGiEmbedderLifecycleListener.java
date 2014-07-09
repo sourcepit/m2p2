@@ -16,7 +16,7 @@ public abstract class AbstractOSGiEmbedderLifecycleListener implements OSGiEmbed
    }
 
    @Override
-   public void frameworkClassLoaderCreated(OSGiEmbedder embeddedEquinox, ClassLoader frameworkClassLoader)
+   public void frameworkInitialized(OSGiEmbedder embeddedEquinox)
    {
    }
 
