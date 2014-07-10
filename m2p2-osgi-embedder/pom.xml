@@ -10,7 +10,7 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>srcpit.org.eclipse.osgi</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.osgi</artifactId>
 		</dependency>
 

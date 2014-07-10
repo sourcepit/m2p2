@@ -28,27 +28,27 @@
 		</dependency>
 
 		<dependency>
-			<groupId>srcpit.org.eclipse.core</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.core.net</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>srcpit.org.eclipse.equinox</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.equinox.security</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.equinox.p2.metadata.repository</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.equinox.p2.director</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.equinox.p2.director.app</artifactId>
 		</dependency>
 

@@ -121,7 +121,7 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
       buildContext.setSession(result.getSession());
 
       ArtifactRepository repo = repositorySystem.createArtifactRepository("srcpit-public",
-         "file:D:/src/git/org.sourcepit.eclipse.artifacts.feature/target/repo", null, null, null);
+         "http://nexus.sourcepit.org/content/groups/public", null, null, null);
 
       MavenProject project = buildContext.getSession().getCurrentProject();
       List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();

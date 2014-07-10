@@ -14,22 +14,22 @@
 		</dependency>
 
 		<dependency>
-			<groupId>srcpit.org.eclipse.core</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.core.net</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>srcpit.org.eclipse.equinox</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.equinox.security</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.equinox.p2.metadata.repository</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>srcpit.org.eclipse.equinox.p2</groupId>
+			<groupId>srcpit.mavenized</groupId>
 			<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
 			<optional>true</optional>
 		</dependency>
