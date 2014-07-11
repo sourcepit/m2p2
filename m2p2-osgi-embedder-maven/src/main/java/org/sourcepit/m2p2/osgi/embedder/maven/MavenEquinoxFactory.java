@@ -11,6 +11,8 @@ import static org.sourcepit.m2p2.osgi.embedder.StartConfigurationUtil.fromProper
 import static org.sourcepit.m2p2.osgi.embedder.StartConfigurationUtil.toBundleStartPolicyProvider;
 import static org.sourcepit.m2p2.osgi.embedder.StartConfigurationUtil.toStartLevelProvider;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -63,7 +65,34 @@ public class MavenEquinoxFactory
       final ClassLoadingStrategy classLoadingStrategy = new ParentFirstClassLoadingStrategy(
          getClass().getClassLoader(), sharedClassesAndResources);
 
-      final FrameworkLocationProvider frameworkLocationProvider = new TempFrameworkLocationProvider();
+      final FrameworkLocationProvider frameworkLocationProvider;
+      final String workDir = configuration.get("m2p2.workDir");
+      if (workDir == null)
+      {
+         frameworkLocationProvider = new TempFrameworkLocationProvider();
+      }
+      else
+      {
+         frameworkLocationProvider = new FrameworkLocationProvider()
+         {
+            @Override
+            public void releaseFrameworkLocation(File frameworkLocation) throws IOException
+            {
+            }
+
+            @Override
+            public File aquireFrameworkLocation() throws IOException
+            {
+               final File loc = new File(workDir);
+               if (!loc.exists())
+               {
+                  loc.mkdirs();
+               }
+               return loc;
+            }
+         };
+      }
+
       final List<ArtifactKey> frameworkArtifacts = getArtifacts(configuration, "m2p2.frameworkArtifacts");
       final List<ArtifactKey> bundleArtifacts = getArtifacts(configuration, "m2p2.bundleArtifacts");
 

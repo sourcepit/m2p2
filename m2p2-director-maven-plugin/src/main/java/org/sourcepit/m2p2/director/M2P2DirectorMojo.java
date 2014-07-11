@@ -130,6 +130,9 @@ public class M2P2DirectorMojo extends AbstractMojo
    @Parameter
    private EclipseIni eclipseIni;
 
+   @Parameter(defaultValue = "${project.build.directory}/p2-director")
+   private File p2DirectorWorkDir;
+
    @Override
    public void execute() throws MojoExecutionException, MojoFailureException
    {
@@ -348,7 +351,9 @@ public class M2P2DirectorMojo extends AbstractMojo
       final OSGiEmbedder embedder;
       try
       {
-         embedder = embedderFactory.create(session, readEmbedderConfiguration());
+         final PropertiesMap conf = readEmbedderConfiguration();
+         conf.put("m2p2.workDir", p2DirectorWorkDir.getAbsolutePath());
+         embedder = embedderFactory.create(session, conf);
       }
       catch (MavenExecutionException e)
       {
