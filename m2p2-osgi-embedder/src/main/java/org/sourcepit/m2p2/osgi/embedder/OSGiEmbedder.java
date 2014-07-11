@@ -128,12 +128,12 @@ public class OSGiEmbedder
       {
          throw pipe(e);
       }
-      
+
       for (OSGiEmbedderLifecycleListener lifecycleListener : lifecycleListeners)
       {
          lifecycleListener.frameworkInitialized(this);
       }
-      
+
       try
       {
          framework.start();
@@ -246,10 +246,17 @@ public class OSGiEmbedder
          try
          {
             framework.stop();
-            framework.waitForStop(timeout);
-         }
-         catch (InterruptedException e)
-         { // noop
+            while (true)
+            {
+               try
+               {
+                  framework.waitForStop(timeout);
+                  break;
+               }
+               catch (InterruptedException e)
+               { // noop
+               }
+            }
          }
          catch (BundleException e)
          {
@@ -270,11 +277,12 @@ public class OSGiEmbedder
       }
       finally
       {
+         framework = null;
          try
          {
-            if (frameworkLocation != null)
+            if (frameworkClassLoader != null)
             {
-               frameworkLocationProvider.releaseFrameworkLocation(frameworkLocation);
+               classLoadingStrategy.disposeFrameworkClassLoader(frameworkClassLoader);
             }
          }
          catch (Exception e)
@@ -283,21 +291,23 @@ public class OSGiEmbedder
          }
          finally
          {
+            frameworkClassLoader = null;
             try
             {
-               if (frameworkClassLoader != null)
+               if (frameworkLocation != null)
                {
-                  classLoadingStrategy.disposeFrameworkClassLoader(frameworkClassLoader);
+                  frameworkLocationProvider.releaseFrameworkLocation(frameworkLocation);
                }
             }
             catch (Exception e)
             {
                errors.add(e);
             }
+            finally
+            {
+               frameworkLocation = null;
+            }
          }
-
-         framework = null;
-         frameworkLocation = null;
       }
 
       errors.throwPipe();
