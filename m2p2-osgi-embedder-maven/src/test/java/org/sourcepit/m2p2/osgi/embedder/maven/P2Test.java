@@ -198,7 +198,7 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
    {
       try
       {
-         equinox.stop(5000);
+         equinox.stop(0);
       }
       finally
       {
@@ -206,7 +206,7 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
       }
    }
 
-   @Test
+//   @Test
    public void testFoo() throws Exception
    {
       IProvisioningAgent provisioningAgent = container.lookup(IProvisioningAgent.class);
