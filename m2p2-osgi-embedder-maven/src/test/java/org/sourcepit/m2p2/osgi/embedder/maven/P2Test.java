@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -39,7 +38,6 @@ import org.eclipse.equinox.internal.p2.director.Explanation;
 import org.eclipse.equinox.internal.p2.director.Projector;
 import org.eclipse.equinox.internal.p2.director.QueryableArray;
 import org.eclipse.equinox.internal.p2.director.Slicer;
-import org.eclipse.equinox.internal.p2.repository.JREHttpClientRequiredException;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.engine.ProvisioningContext;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
@@ -206,7 +204,7 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
       }
    }
 
-//   @Test
+   @Test
    public void testFoo() throws Exception
    {
       IProvisioningAgent provisioningAgent = container.lookup(IProvisioningAgent.class);
