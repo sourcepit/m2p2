@@ -7,15 +7,13 @@
 package org.sourcepit.m2p2.director;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.sourcepit.common.utils.io.IO;
 
 public class ArgumentModificationsTest
 {
