@@ -28,6 +28,7 @@
 		<module>m2p2-director-maven-plugin</module>
 		<module>org.sourcepit.m2p2.cache</module>
 		<module>org.sourcepit.m2p2.director.app</module>
+		<module>m2p2-repocrawler-maven-plugin</module>
 	</modules>
 
 	<dependencyManagement>
