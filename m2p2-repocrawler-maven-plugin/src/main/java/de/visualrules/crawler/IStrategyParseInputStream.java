@@ -46,7 +46,7 @@ class CreateConnection implements IStrategyParseInputStream
       }
       catch (IOException e)
       {
-         System.out.println("URL unreachable");
+         System.out.println("URL unreachable " + url);
          e.printStackTrace();
          return null;
       }

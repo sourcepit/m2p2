@@ -5,6 +5,7 @@
 package de.visualrules.crawler;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -18,6 +19,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,16 +53,16 @@ public class XMLMaker
       }
    }
 
-   public boolean generateXML(String saveFolderPath, String fileName, String repositoryNameInXmlFile)
+   public boolean generateXML(String saveFolderPath, String fileName, String repositoryNameInXmlFile) throws IOException
    {
       if (!this.urlsWithContentFileIsEmpty)
       {
          // Get the folder path
          this.saveFolder = new File(saveFolderPath);
-         createSaveFolder(this.saveFolder);
+         FileUtils.forceMkdir(this.saveFolder);
          if (this.saveFolder.exists())
          {
-            this.generateFilePath(saveFolderPath, fileName);
+            new File(saveFolderPath, fileName);
 
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             try
@@ -127,7 +129,7 @@ public class XMLMaker
                // For OutputPropertiesFactory you need to add org.apache.xml.serializer
                // transformer.setOutputProperty(OutputPropertiesFactory.S_KEY_INDENT_AMOUNT,"3");
                DOMSource source = new DOMSource(doc);
-               File tmpFile = this.generateFilePath(saveFolderPath, fileName);
+               File tmpFile = new File(saveFolderPath, fileName);
                StreamResult result = new StreamResult(tmpFile);
 
                // Output to console for testing
@@ -166,27 +168,6 @@ public class XMLMaker
       {
          return false;
       }
-   }
-
-   private void createSaveFolder(File saveFolder)
-   {
-      if(!this.saveFolder.exists())
-      {
-         if(!this.saveFolder.mkdir())
-         {
-            System.out.println("!!!XMLMaker: Can't create the save folder: "+saveFolder.getAbsolutePath());
-         }
-      }
-   }
-
-   private File generateFilePath(String saveFolderPath, String fileName)
-   {
-      if (!saveFolderPath.endsWith("/"))
-      {
-         saveFolderPath += "/";
-      }
-
-      return new File(saveFolderPath + fileName);
    }
 
 }

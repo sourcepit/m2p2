@@ -56,7 +56,7 @@ public class XMLMakerTest
 
    private List<String> generateFakeUrls(int countOfUrls)
    {
-      List<String> generatedUrls = new ArrayList<>();
+      List<String> generatedUrls = new ArrayList<String>();
       for (int i = 0; i <= countOfUrls; i++)
       {
          generatedUrls.add("http://www.fakeUrl.de/test/" + i);

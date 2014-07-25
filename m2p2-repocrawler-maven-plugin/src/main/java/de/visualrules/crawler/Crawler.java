@@ -4,6 +4,7 @@
 
 package de.visualrules.crawler;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Proxy.Type;
@@ -47,8 +48,9 @@ public class Crawler
     * @param saveFolderPath - Path to the folder in which the XML file should be saved
     * @param fileName - Filename of the generated xml file
     * @param repositoryNameInXMLFile - It is the name attribute in the repository element of the xml file
+    * @throws IOException 
     */
-   public void start(String url, String saveFolderPath, String fileName, String repositoryNameInXMLFile)
+   public void start(String url, String saveFolderPath, String fileName, String repositoryNameInXMLFile) throws IOException
    {
       long start = System.currentTimeMillis();
 
@@ -80,7 +82,7 @@ public class Crawler
    }
 
    private void generateXML(String saveFolderPath, String fileName, String repositoryNameInXMLFile,
-      List<String> updateSites)
+      List<String> updateSites) throws IOException
    {
       // Print the results
       System.out.println("-------------Saved Links-----------------");

@@ -28,7 +28,7 @@ public class FileCounter extends RecursiveTask<Integer>
    {
       int counter = 0;
 
-      List<FileCounter> subTasks = new ArrayList<>();
+      List<FileCounter> subTasks = new ArrayList<FileCounter>();
 
       File[] files = folder.listFiles();
 

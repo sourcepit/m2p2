@@ -41,7 +41,7 @@ public class FutureExample
          }
       };
 
-      List<Callable<Double>> tasks = new ArrayList<>();
+      List<Callable<Double>> tasks = new ArrayList<Callable<Double>>();
       for (int i = 0; i < 10000; i++)
       {
          tasks.add(random);

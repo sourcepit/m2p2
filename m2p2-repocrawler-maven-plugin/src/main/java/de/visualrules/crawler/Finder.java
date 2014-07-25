@@ -75,10 +75,10 @@ public class Finder extends RecursiveTask<List<String>>
          {
             Elements resultLinks = doc.select("a");
 
-            subTasks = new ArrayList<>();
+            subTasks = new ArrayList<Finder>();
             if (!this.strategy.isUpdateSite(resultLinks))
             {
-               Set<String> urls = new LinkedHashSet<>();
+               Set<String> urls = new LinkedHashSet<String>();
                DocumentUtil.collectHierachicalChildURLs(resultLinks, urls);
 
                for (String url : urls)

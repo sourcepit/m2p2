@@ -4,6 +4,7 @@
 
 package de.visualrules.mojo;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -104,8 +105,6 @@ import de.visualrules.crawler.Crawler;
 public class StartCrawler extends AbstractMojo
 {
    @Parameter(required = true)
-   private String url;
-   @Parameter(required = true)
    private String pathOutputFolder;
    @Parameter(required = true)
    private String outputFileName;
@@ -122,39 +121,49 @@ public class StartCrawler extends AbstractMojo
    public void execute() throws MojoExecutionException
    {
       RepositorySystemSession repositorySession = buildContext.getRepositorySession();
-      ArtifactRepository artifactRepository;
 
+      final ArtifactRepository artifactRepository;
       try
       {
          artifactRepository = repositorySystem.buildArtifactRepository(repository);
-         List<ArtifactRepository> repos = Collections.singletonList(artifactRepository);
-         repositorySystem.injectProxy(repositorySession, repos);
-         repositorySystem.injectAuthentication(repositorySession, repos);
-
-         getLog().info("---------Crawler plugin");
-         getLog().info("---Starting crawler plugin for m2e update sites with the following parameters");
-         getLog().info(
-            "---Parameters:\nURL: \"" + this.url + "\"\nOutput foler: \"" + this.pathOutputFolder
-               + "\"\noutput file name: \"" + this.outputFileName + "\"");
-         Crawler crawler;
-         // Proxy settings set?
-         if (artifactRepository.getProxy() == null)
-         {
-            crawler = new Crawler();
-         }
-         else
-         {
-            String proxyHost = artifactRepository.getProxy().getHost();
-            int proxyPort = artifactRepository.getProxy().getPort();
-            getLog().info("---Proxy settings:\nProxy: \"" + proxyHost + "\"\nPort: \"" + proxyPort + "\"");
-            crawler = new Crawler(proxyHost, proxyPort);
-         }
-
-         crawler.start(this.url, this.pathOutputFolder, this.outputFileName, this.repositoryNameInXMLFile);
       }
       catch (InvalidRepositoryException e)
       {
-         e.printStackTrace();
+         throw new MojoExecutionException("Unable to build artifact repository  " + repository, e);
+      }
+
+      List<ArtifactRepository> repos = Collections.singletonList(artifactRepository);
+      repositorySystem.injectProxy(repositorySession, repos);
+      repositorySystem.injectAuthentication(repositorySession, repos);
+
+      final String url = artifactRepository.getUrl();
+
+      getLog().info("---------Crawler plugin");
+      getLog().info("---Starting crawler plugin for m2e update sites with the following parameters");
+      getLog().info(
+         "---Parameters:\nURL: \"" + url + "\"\nOutput foler: \"" + this.pathOutputFolder + "\"\noutput file name: \""
+            + this.outputFileName + "\"");
+      Crawler crawler;
+      // Proxy settings set?
+      if (artifactRepository.getProxy() == null)
+      {
+         crawler = new Crawler();
+      }
+      else
+      {
+         String proxyHost = artifactRepository.getProxy().getHost();
+         int proxyPort = artifactRepository.getProxy().getPort();
+         getLog().info("---Proxy settings:\nProxy: \"" + proxyHost + "\"\nPort: \"" + proxyPort + "\"");
+         crawler = new Crawler(proxyHost, proxyPort);
+      }
+
+      try
+      {
+         crawler.start(url, this.pathOutputFolder, this.outputFileName, this.repositoryNameInXMLFile);
+      }
+      catch (IOException e)
+      {
+         throw new MojoExecutionException("Error while crawling for p2 repositories", e);
       }
    }
 }
