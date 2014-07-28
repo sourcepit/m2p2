@@ -1,5 +1,7 @@
-/*
- * Copyright (C) 2014 Bosch Software Innovations GmbH. All rights reserved.
+/**
+ * Copyright (c) 2014 Sourcepit.org contributors and others. All rights reserved. This program and the accompanying
+ * materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
 package de.visualrules.mojo;
@@ -39,12 +41,13 @@ import de.visualrules.crawler.Crawler;
  *     <artifactId>m2e-connectors-collector-reloaded</artifactId>
  *     <version>0.0.1-SNAPSHOT</version>
  *     <configuration>
- *         <url>http://central.maven.org/maven2/.m2e/connectors/m2e/1.3.0/</url>
- *         <pathOutputFolder>D:\\xmlfiles</pathOutputFolder>
+ *          <repository>
+               <id>foo</id>
+               <url>http://central.maven.org/maven2/.m2e/connectors/m2e/1.3.0</url>
+           </repository>
+ *         <pathOutputFolder>D:\xmlfiles</pathOutputFolder>
  *         <outputFileName>test.xml</outputFileName>
  *         <repositoryNameInXMLFile>testRepo</repositoryNameInXMLFile>
- *         <proxy>cache</proxy>
- *         <port>3128</port>
  *     </configuration>
  *     <executions>
  *         <execution>
@@ -73,10 +76,6 @@ import de.visualrules.crawler.Crawler;
  * <th>Description</th>
  * </tr>
  * <tr>
- * <td>{@code <url>}</td>
- * <td><b>Required</b> - The crawler searches after update sites over the given url</td>
- * </tr>
- * <tr>
  * <td>{@code <pathOutputFolder>}</td>
  * <td><b>Required</b> - In this folder the generated xml file will be saved</td>
  * </tr>
@@ -85,16 +84,12 @@ import de.visualrules.crawler.Crawler;
  * <td><b>Required</b> - This is the name of the generated xml file</td>
  * </tr>
  * <tr>
+ * <td>{@code <repository>}</td>
+ * <td><b>Required</b> - Typ {@code Repository} = Maven Repository</td>
+ * </tr>
+ * <tr>
  * <td>{@code <repositoryNameInXMLFile>}</td>
  * <td><b>Optional</b> - It is the name attribute in the repository element of the xml file</td>
- * </tr>
- * <tr>
- * <td>{@code <proxy>}</td>
- * <td><b>Optional</b> - Proxy url</td>
- * </tr>
- * <tr>
- * <td>{@code <port>}</td>
- * <td><b>Optional</b> - Port for the proxy settings</td>
  * </tr>
  * </table>
  * </p>
