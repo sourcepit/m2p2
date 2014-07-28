@@ -9,10 +9,8 @@ package de.visualrules.crawler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,7 +39,6 @@ import org.w3c.dom.ProcessingInstruction;
 public class XMLMaker
 {
    private List<String> urlsWithContentFile;
-   private List<String> urlsWithConentFileLatestUrls;
    private File saveFolder;
    private boolean urlsWithContentFileIsEmpty;
 
@@ -50,13 +47,15 @@ public class XMLMaker
    {
       if (!urlsWithContentFile.isEmpty())
       {
-         this.urlsWithConentFileLatestUrls = getLatestUrls(urlsWithContentFile, 3);
-         for (String string : urlsWithConentFileLatestUrls)
-         {
-            System.out.println("latest: " + string);
-         }
-         this.urlsWithContentFile = urlsWithContentFile;
-         List<String> unmodifiableUrlsWithContentFile = Collections.unmodifiableList(this.urlsWithConentFileLatestUrls);
+         //Just save 4 items of every link group
+         //e. g. 
+         /* http://central.maven.org/maven2/.m2e/connectors/m2e/1.6.0/N/1.6.0.20140628-1445/ < not saved
+            http://central.maven.org/maven2/.m2e/connectors/m2e/1.6.0/N/1.6.0.20140708-0459/ < not saved
+            http://central.maven.org/maven2/.m2e/connectors/m2e/1.6.0/N/1.6.0.20140708-0741/ < saved
+            http://central.maven.org/maven2/.m2e/connectors/m2e/1.6.0/N/1.6.0.20140709-1511/ < saved
+            http://central.maven.org/maven2/.m2e/connectors/m2e/1.6.0/N/1.6.0.20140712-1411/ < saved
+            http://central.maven.org/maven2/.m2e/connectors/m2e/1.6.0/N/1.6.0.20140720-0901/ < saved*/
+         this.urlsWithContentFile = Collections.unmodifiableList(getLatestUrls(urlsWithContentFile, 4));
          this.urlsWithContentFileIsEmpty = false;
       }
       else
@@ -77,36 +76,22 @@ public class XMLMaker
       String firstElement = urlsWithContentFile.get(urlsWithContentFile.size() - 1);
       tmpSavedUrls.add(firstElement);
       overallSavedUrls.add(firstElement);
-      //Starts with the second element because the first is always needed 
+      // Starts with the second element because the first is always needed
       for (int i = urlsWithContentFile.size() - 2; i >= 0; i--)
       {
-         String urlToCompare;
-         // Last element?
-         if (i != 0)
-         {
-            urlToCompare = urlsWithContentFile.get(i - 1);
-         }
-         else
-         {
-            break;
-         }
          String urlToCheck = urlsWithContentFile.get(i);
 
-         boolean urlRootIsSameAsTmpUrls = childsAreSameAsOneTmpUrl(urlToCheck, tmpSavedUrls);
-         //If url root in "urlToCheck" differs to the "urlToCompare" string and the tmpSavedUrls list is full
-         if (urlRootIsSameAsTmpUrls == false && (tmpSavedUrls.size() == numberOfUrlPerGroupFinal))
+         boolean urlRootIsSameAsTmpUrls = childsAreSameAsTmpUrls(urlToCheck, tmpSavedUrls);
+         // If url root in "urlToCheck" differs to the urls that are saved in "tmpSavedUrls"
+         if (urlRootIsSameAsTmpUrls == false && (tmpSavedUrls.size() <= numberOfUrlPerGroupFinal))
          {
             overallSavedUrls.add(urlToCheck);
             tmpSavedUrls.clear();
             tmpSavedUrls.add(urlToCheck);
          }
-         //If url root in "urlToCheck" differs to the "urlToCompare" string and tmpSavedUrls is not full 
-         else if (urlRootIsSameAsTmpUrls == false && (tmpSavedUrls.size() < numberOfUrlPerGroupFinal))
-         {
-            overallSavedUrls.add(urlToCheck);
-            tmpSavedUrls.add(urlToCheck);
-         }
-         //If url root in "urlToCheck" is the same than in the "urlToCompare" string and the tmpSavedUrls list is not full
+         // If url root in "urlToCheck" is the same than an url from the "tmpSavedUrl" list and the tmpSavedUrls list is
+         // not
+         // full
          else if (urlRootIsSameAsTmpUrls == true && (tmpSavedUrls.size() < numberOfUrlPerGroupFinal))
          {
             overallSavedUrls.add(urlToCheck);
@@ -116,7 +101,7 @@ public class XMLMaker
       return overallSavedUrls;
    }
 
-   private boolean childsAreSameAsOneTmpUrl(String urlToCheck, List<String> tmpSavedUrls)
+   private boolean childsAreSameAsTmpUrls(String urlToCheck, List<String> tmpSavedUrls)
    {
       if (tmpSavedUrls.isEmpty())
       {
@@ -124,14 +109,17 @@ public class XMLMaker
       }
       else
       {
-         String[] splittedTmpUrl = tmpSavedUrls.get(0).split("/");
-         String[] splittedUrlToCheck = urlToCheck.split("/");
-         // Just compare the root
-         for (int i = 0; i < splittedTmpUrl.length - 1; i++)
+         for (int i = 0; i < tmpSavedUrls.size(); i++)
          {
-            if (!(splittedTmpUrl[i].equals(splittedUrlToCheck[i])))
+            String[] splittedTmpUrl = tmpSavedUrls.get(i).split("/");
+            String[] splittedUrlToCheck = urlToCheck.split("/");
+            // Just compare the root
+            for (int z = 0; z < splittedTmpUrl.length - 1; z++)
             {
-               return false;
+               if (!(splittedTmpUrl[z].equals(splittedUrlToCheck[z])))
+               {
+                  return false;
+               }
             }
          }
          return true;
@@ -161,8 +149,6 @@ public class XMLMaker
          FileUtils.forceMkdir(this.saveFolder);
          if (this.saveFolder.exists())
          {
-            new File(saveFolderPath, fileName);
-
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             try
             {
