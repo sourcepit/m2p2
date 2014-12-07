@@ -259,7 +259,7 @@ public class P2Test extends EmbeddedMavenEnvironmentTest
       final IQuery<IInstallableUnit> query = QueryUtil.createCompoundQuery(queries, false);
 
       IQueryable<IInstallableUnit> metadata = context.getMetadata(null);
-      IQueryResult<IInstallableUnit> queryResult = metadata.query(query, null);
+      IQueryResult<IInstallableUnit> queryResult = metadata.query(QueryUtil.createLatestQuery(query), null);
 
 
       IInstallableUnit[] roots = queryResult.toArray(IInstallableUnit.class);
