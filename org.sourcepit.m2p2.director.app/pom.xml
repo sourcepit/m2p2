@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.sourcepit.m2p2</groupId>
 		<artifactId>m2p2</artifactId>
-		<version>0.6.0</version>
+		<version>0.7.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>org.sourcepit.m2p2.director.app</artifactId>
 
