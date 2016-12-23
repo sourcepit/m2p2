@@ -7,12 +7,12 @@
 	</parent>
 	<groupId>org.sourcepit.m2p2</groupId>
 	<artifactId>m2p2</artifactId>
-	<version>0.7.0</version>
+	<version>0.8.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<scm>
 		<connection>scm:git:git@github.com:sourcepit/m2p2.git</connection>
-		<tag>0.7.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<repositories>
