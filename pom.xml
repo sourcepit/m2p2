@@ -75,52 +75,52 @@
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.osgi</artifactId>
-				<version>3.10.0-v20140606-1445</version>
+				<version>3.11.2-v20161107-1947</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.core.net</artifactId>
-				<version>1.2.200-v20140124-2013</version>
+				<version>1.3.0-v20160418-1534</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.equinox.security</artifactId>
-				<version>1.2.0-v20130424-1801</version>
+				<version>1.2.200-v20150715-1528</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.equinox.p2.metadata.repository</artifactId>
-				<version>1.2.100-v20131209-2144</version>
+				<version>1.2.300-v20160419-0834</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
-				<version>1.1.300-v20131211-1531</version>
+				<version>1.1.500-v20160419-0834</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.equinox.p2.director</artifactId>
-				<version>2.3.100-v20140224-1921</version>
+				<version>2.3.300-v20160504-1450</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.equinox.p2.engine</artifactId>
-				<version>2.3.0-v20140506-1720</version>
+				<version>2.4.100-v20160419-0834</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.equinox.p2.publisher</artifactId>
-				<version>1.3.0-v20140129-1408</version>
+				<version>1.4.100-v20160504-1450</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.equinox.p2.director.app</artifactId>
-				<version>1.0.300-v20140228-1829</version>
+				<version>1.0.500-v20160419-0834</version>
 			</dependency>
 			<dependency>
 				<groupId>srcpit.mavenized</groupId>
 				<artifactId>org.eclipse.equinox.p2.transport.ecf</artifactId>
-				<version>1.1.0-v20140408-1354</version>
+				<version>1.1.201-v20161115-1927</version>
 			</dependency>
 			<dependency>
 				<groupId>org.sonatype.plexus</groupId>
