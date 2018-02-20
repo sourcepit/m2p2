@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.sourcepit.m2p2</groupId>
 		<artifactId>m2p2</artifactId>
-		<version>0.8.0</version>
+		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>m2p2-osgi-embedder</artifactId>
 
