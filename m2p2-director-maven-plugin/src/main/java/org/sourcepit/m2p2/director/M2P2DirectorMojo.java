@@ -114,21 +114,8 @@ public class M2P2DirectorMojo extends AbstractMojo
    @Parameter
    private Properties profileProperties;
 
-   // -bundlepool d:/eclipse/
    @Parameter
-   private File bundlepool;
-
-   // -p2.os linux
-   @Parameter
-   private String os;
-
-   // -p2.ws gtk
-   @Parameter
-   private String ws;
-
-   // -p2.arch x86
-   @Parameter
-   private String arch;
+   private List<TargetEnvironment> envs;
 
    // -roaming
    @Parameter(defaultValue = "false")
@@ -157,95 +144,43 @@ public class M2P2DirectorMojo extends AbstractMojo
       {
          final BundleContext bundleContext = embedder.getBundleContext();
 
-         final List<String> arguments = new ArrayList<String>();
-         arguments.add("-application");
-         arguments.add("org.sourcepit.mp2p.director");
+         final Collection<URI> repositories = applyRepositories(bundleContext);
 
-         arguments.add("-repository");
-         arguments.add(toArgument(applyRepositories(bundleContext)));
-
-         arguments.add("-installIUs");
-         arguments.add(toArgument(installIUs));
-
-         arguments.add("-destination");
-         arguments.add(destination.toString());
-
-         arguments.add("-tag");
-         arguments.add(tag);
-
-         arguments.add("-profile");
-         arguments.add(profile);
-
-         if (profileProperties == null)
+         for (TargetEnvironment env : envs)
          {
-            profileProperties = new Properties();
-            profileProperties.setProperty("org.eclipse.update.install.features", "true");
+            final List<String> arguments = createArguments(repositories, env);
+
+            final StringBuilder sb = new StringBuilder();
+            for (String argument : arguments)
+            {
+               sb.append(argument);
+               sb.append(' ');
+            }
+            sb.deleteCharAt(sb.length() - 1);
+
+            getLog().info(sb.toString());
+
+            // set new env args
+            final EclipseEnvironmentInfo envInfo = newEclipseEnvironmentInfo(bundleContext);
+            final String[] args = arguments.toArray(new String[arguments.size()]);
+            envInfo.setAllArgs(args);
+            envInfo.setAppArgs(args);
+            envInfo.setFrameworkArgs(args);
+
+            // reset org.eclipse.equinox.internal.app.CommandLineArgs
+            final Bundle equinoxApp = BundleContextUtil.getBundle(bundleContext, "org.eclipse.equinox.app");
+            equinoxApp.stop();
+            equinoxApp.start();
+
+            final FrameworkLog log = BundleContextUtil.getService(bundleContext, FrameworkLog.class);
+            final EclipseAppLauncher appLauncher = new EclipseAppLauncher(bundleContext, false, true, log, null);
+            final ServiceRegistration<?> registration = bundleContext
+               .registerService(ApplicationLauncher.class.getName(), appLauncher, null);
+            appLauncher.start(null);
+            registration.unregister();
+            appLauncher.shutdown();
+
          }
-
-         if (profileProperties != null)
-         {
-            arguments.add("-profileProperties");
-            arguments.add(toArgument(profileProperties));
-         }
-
-         if (bundlepool != null)
-         {
-            arguments.add("-bundlepool");
-            arguments.add(bundlepool.toString());
-         }
-
-         if (os != null)
-         {
-            arguments.add("-p2.os");
-            arguments.add(os);
-         }
-
-         if (ws != null)
-         {
-            arguments.add("-p2.ws");
-            arguments.add(ws);
-         }
-
-         if (arch != null)
-         {
-            arguments.add("-p2.arch");
-            arguments.add(arch);
-         }
-
-         if (roaming)
-         {
-            arguments.add("-roaming");
-         }
-
-         final StringBuilder sb = new StringBuilder();
-         for (String argument : arguments)
-         {
-            sb.append(argument);
-            sb.append(' ');
-         }
-         sb.deleteCharAt(sb.length() - 1);
-
-         getLog().info(sb.toString());
-
-         // set new env args
-         final EclipseEnvironmentInfo envInfo = newEclipseEnvironmentInfo(bundleContext);
-         final String[] args = arguments.toArray(new String[arguments.size()]);
-         envInfo.setAllArgs(args);
-         envInfo.setAppArgs(args);
-         envInfo.setFrameworkArgs(args);
-
-         // reset org.eclipse.equinox.internal.app.CommandLineArgs
-         final Bundle equinoxApp = BundleContextUtil.getBundle(bundleContext, "org.eclipse.equinox.app");
-         equinoxApp.stop();
-         equinoxApp.start();
-
-         final FrameworkLog log = BundleContextUtil.getService(bundleContext, FrameworkLog.class);
-         final EclipseAppLauncher appLauncher = new EclipseAppLauncher(bundleContext, false, true, log, null);
-         final ServiceRegistration<?> registration = bundleContext.registerService(ApplicationLauncher.class.getName(),
-            appLauncher, null);
-         appLauncher.start(null);
-         registration.unregister();
-         appLauncher.shutdown();
       }
       catch (Exception e)
       {
@@ -256,21 +191,84 @@ public class M2P2DirectorMojo extends AbstractMojo
          embedder.stop(0);
       }
 
-      if (eclipseIni != null && eclipseIni.getAppArgs() != null && eclipseIni.getVMArgs() != null)
+      for (TargetEnvironment env : envs)
       {
-         try
+         if (eclipseIni != null && eclipseIni.getAppArgs() != null && eclipseIni.getVMArgs() != null)
          {
-            adoptEclipseIni();
-         }
-         catch (IOException e)
-         {
-            throw new MojoExecutionException("Failed to adopt eclipse.ini.", e);
+            try
+            {
+               adoptEclipseIni(env);
+            }
+            catch (IOException e)
+            {
+               throw new MojoExecutionException("Failed to adopt eclipse.ini.", e);
+            }
          }
       }
    }
 
-   private void adoptEclipseIni() throws IOException
+   private List<String> createArguments(final Collection<URI> repositories, TargetEnvironment env)
    {
+      final List<String> arguments = new ArrayList<String>();
+      arguments.add("-application");
+      arguments.add("org.sourcepit.mp2p.director");
+
+      arguments.add("-repository");
+      arguments.add(toArgument(repositories));
+
+      arguments.add("-installIUs");
+      arguments.add(toArgument(installIUs));
+
+      arguments.add("-tag");
+      arguments.add(tag);
+
+      arguments.add("-profile");
+      arguments.add(profile);
+
+      if (profileProperties == null)
+      {
+         profileProperties = new Properties();
+         profileProperties.setProperty("org.eclipse.update.install.features", "true");
+      }
+
+      if (profileProperties != null)
+      {
+         arguments.add("-profileProperties");
+         arguments.add(toArgument(profileProperties));
+      }
+
+      if (env.getOs() != null)
+      {
+         arguments.add("-p2.os");
+         arguments.add(env.getOs());
+      }
+
+      if (env.getWs() != null)
+      {
+         arguments.add("-p2.ws");
+         arguments.add(env.getWs());
+      }
+
+      if (env.getArch() != null)
+      {
+         arguments.add("-p2.arch");
+         arguments.add(env.getArch());
+      }
+
+      arguments.add("-destination");
+      arguments.add(new File(destination, env.toString()).toString());
+
+      if (roaming)
+      {
+         arguments.add("-roaming");
+      }
+      return arguments;
+   }
+
+   private void adoptEclipseIni(TargetEnvironment env) throws IOException
+   {
+      final File destination = new File(this.destination, env.toString());
+      
       applyDefaults(destination, eclipseIni, defaultEncoding);
 
       final List<String> appArgs = new ArrayList<String>();
